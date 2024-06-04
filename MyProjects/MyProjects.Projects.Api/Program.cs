@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.EntityFrameworkCore;
 using MyProjects.Projects.Api.Infrastructure.Database;
 using MyProjects.Projects.Api.Models;
+using MyProjects.Projects.Api.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,46 +25,87 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddScoped<IProjectsRepository, ProjectsRepository>();
 
 var app = builder.Build();
 
 app.UseSwagger();
 
-app.UseSwaggerUI();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "My Projects - Project V1");
+});
 
 app.UseCors();
 
 var projects = new List<Project>();
 
-app.MapGet("/projects/all", [EnableCors(PolicyName = "free")] () =>
+app.MapGet("/projects", [EnableCors(PolicyName = "free")] (IProjectsRepository repository) =>
 {
-    projects = new List<Project>
+    var projects = repository.GetAll();
+
+    return Results.Ok(projects);
+}).CacheOutput(c => c.Expire(TimeSpan.FromSeconds(60)).Tag("projects-get"));
+
+app.MapGet("/projects/{id:string}", async (string id, IProjectsRepository repository) =>
+{
+    var project = await repository.GetById(id);
+
+    if (project == null)
     {
-        new Project { Id = "1", Name = "Project 1", Description="", Status = 1 },
-        new Project { Id = "2", Name = "Project 2", Description="", Status = 1 },
-        new Project { Id = "3", Name = "Project 3", Description="", Status = 1 }
-    };
+        return Results.NotFound();
+    }
 
-    return projects;
+    return Results.Ok(project);
 });
 
-app.MapGet("/projects/byid", (string id) =>
+app.MapPost("/projects", async (Project project, IProjectsRepository repository, IOutputCacheStore outputCacheStore) =>
 {
-    return projects.FirstOrDefault(x => x.Id == id);
+    var id = await repository.Create(project);
+
+    await ClearRefCache(outputCacheStore);
+
+    return Results.Created($"/projects/{id}", project);
 });
 
-app.MapPost("/projects", (Project project) =>
+app.MapPut("/projects", async (string id, Project project, IProjectsRepository repository, IOutputCacheStore outputCacheStore) =>
 {
-    projects.Add(project);
+    var exists = await repository.Exists(id);
+
+    if (!exists)
+    {
+        return Results.BadRequest();
+    }
+
+    await repository.Update(project);
+
+    await ClearRefCache(outputCacheStore);
+
+    return Results.Ok(project);
+
 });
 
-app.MapPut("/projects", (string id, Project project) =>
+app.MapDelete("/project/{id:string}", async (string id, IProjectsRepository repository, IOutputCacheStore outputCacheStore) =>
 {
+    var exists = await repository.Exists(id);
 
+    if (!exists)
+    {
+        return Results.BadRequest();
+    }
+
+    await repository.Delete(id);
+
+    await ClearRefCache(outputCacheStore);
+
+    return Results.NoContent();
 });
 
-app.MapDelete("/project", () => "Hello World!");
-
+static async Task ClearRefCache(IOutputCacheStore outputCacheStore)
+{
+    await outputCacheStore.EvictByTagAsync("projects-get", default);
+}
 
 
 app.Run();
+
