@@ -15,8 +15,8 @@ namespace MyProjects.Projects.Api.Repositories
 
         public async Task<string> Create(Project project)
         {
-            this.context.Add(project);
-            await this.context.SaveChangesAsync();
+            context.Add(project);
+            await context.SaveChangesAsync();
             return project.Id;
         }
 
@@ -27,12 +27,7 @@ namespace MyProjects.Projects.Api.Repositories
 
         public async Task<bool> Exists(string id)
         {
-            return await this.GetById(id) != null;
-        }
-
-        public async Task<IEnumerable<Project>> GetAll()
-        {
-            return await this.context.Projects.OrderBy(p => p.Name).ToListAsync();
+            return await GetById(id) != null;
         }
 
         public async Task<Project?> GetById(string id)
@@ -42,8 +37,16 @@ namespace MyProjects.Projects.Api.Repositories
 
         public async Task Update(Project project)
         {
-            this.context.Update(project);
-            await this.context.SaveChangesAsync();
+            context.Update(project);
+            await context.SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<Project>> GetAll()
+        {
+            var data = await context.Projects.ToListAsync();
+
+             return data.AsQueryable().OrderBy(p => p.Name);
+            
         }
     }
 }
