@@ -5,7 +5,7 @@ VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2. Services", "2. Services", "{80C0F9D0-D9A4-435F-8649-F7E555E80951}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "5. Shared", "5. Shared", "{5A5ACB82-3134-47E5-B7D8-66ECB79FEB4C}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "4. Shared", "4. Shared", "{5A5ACB82-3134-47E5-B7D8-66ECB79FEB4C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyProjects.Api", "MyProjects.Api\MyProjects.Api.csproj", "{4A33D623-ECE0-49FE-A3FF-5E17221E2734}"
 EndProject
@@ -17,11 +17,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3. Layers", "3. Layers", "{
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyProjects.Application", "MyProjects.Application\MyProjects.Application.csproj", "{11FCAC4E-E8A9-4329-8003-6FF6522077BE}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "4. BuildingBlocks", "4. BuildingBlocks", "{D0BFB9AE-65E4-45B8-B383-FC3056E64402}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "0. BuildingBlocks", "0. BuildingBlocks", "{D0BFB9AE-65E4-45B8-B383-FC3056E64402}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1. Clients", "1. Clients", "{32CEB4A6-3449-4C5C-A1F5-8F7798B2BE8D}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "0. Docs", "0. Docs", "{DB485201-218E-49FE-A2ED-09CB45DFAD47}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyProjects.Domain", "MyProjects.Domain\MyProjects.Domain.csproj", "{5D589DB9-3E3C-4A43-99B4-EC1EB8A99518}"
 EndProject

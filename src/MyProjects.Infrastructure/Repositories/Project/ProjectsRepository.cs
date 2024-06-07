@@ -1,27 +1,31 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+
 using MyProjects.Domain.ProjectAggregate;
+
 
 namespace MyProjects.Infrastructure.Database
 {
-    public class ProjectsRepository : IProjectsRepository
+    public class ProjectsRepository(ApplicationDbContext context, IMapper mapper) : IProjectsRepository
     {
-        private readonly ApplicationDbContext context;
 
-        public ProjectsRepository(ApplicationDbContext context)
+        public async Task<IEnumerable<Project>> GetAll()
         {
-            this.context = context;
+            var prjectsTable = await context.Projects.ToListAsync();
+
+            var projectsDomain = mapper.Map<IEnumerable<Project>>(prjectsTable);
+
+            return projectsDomain;
+
         }
 
-        public async Task<string> Create(Project project)
+        public async Task<Project> GetById(string id)
         {
-            context.Add(project);
-            await context.SaveChangesAsync();
-            return project.Id;
-        }
+            var projectTable = await context.Projects.FirstOrDefaultAsync(x => x.Id == id);
 
-        public async Task Delete(string id)
-        {
-            await context.Projects.Where(Projects => Projects.Id == id).ExecuteDeleteAsync();
+            var projectDomain = mapper.Map<Project>(projectTable);
+
+            return projectDomain;
         }
 
         public async Task<bool> Exists(string id)
@@ -29,25 +33,25 @@ namespace MyProjects.Infrastructure.Database
             return await GetById(id) != null;
         }
 
-        public async Task<Project?> GetById(string id)
-        {
-            var project = await context.Projects.FirstOrDefaultAsync(x => x.Id == id);
 
-            return null;
+        public async Task Create(Project project)
+        {
+            context.Add(project);
+            await context.SaveChangesAsync();
         }
 
-        public async System.Threading.Tasks.Task Update(Project project)
+
+
+
+        public async Task Update(Project project)
         {
             context.Update(project);
             await context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<Project>> GetAll()
+        public async Task Delete(string id)
         {
-            var data = await context.Projects.ToListAsync();
-
-            return (IEnumerable<Project>)data.AsQueryable().OrderBy(p => p.Name);
-
+            await context.Projects.Where(Projects => Projects.Id == id).ExecuteDeleteAsync();
         }
     }
 }

@@ -7,7 +7,6 @@
         public string? Description { get; set; }
         public string? Picture { get; set; }
         public IEnumerable<VendorTable>? Vendors { get; set; }
-        public IEnumerable<TaskTable>? Tasks { get; set; }
         public int Status { get; set; } = 1;
     }
 }

@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using MyProjects.Domain.ProjectAggregate;
+using MyProjects.Domain.VendorAggregate;
 using MyProjects.Infrastructure.Database;
+using MyProjects.Infrastructure.Repositories.Vendor;
 using MyProjects.Projects.Api.Endpoints;
 
 
@@ -33,6 +35,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(typeof(Program));
 
 builder.Services.AddScoped<IProjectsRepository, ProjectsRepository>();
+builder.Services.AddScoped<IVendorRepository, VendorRepository>();
 
 var app = builder.Build();
 
