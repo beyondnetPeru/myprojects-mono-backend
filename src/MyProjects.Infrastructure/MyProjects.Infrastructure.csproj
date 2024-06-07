@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MyProjects.BusinessLayer\MyProjects.Domain.csproj" />
+    <ProjectReference Include="..\MyProjects.Domain\MyProjects.Domain.csproj" />
   </ItemGroup>
 
 </Project>
