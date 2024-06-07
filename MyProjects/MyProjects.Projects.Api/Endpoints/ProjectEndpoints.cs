@@ -1,6 +1,8 @@
 ﻿
+using AutoMapper;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.OutputCaching;
+using MyProjects.Projects.Api.DTOs;
 using MyProjects.Projects.Api.Models;
 using MyProjects.Projects.Api.Repositories;
 
@@ -11,28 +13,30 @@ namespace MyProjects.Projects.Api.Endpoints
 
         public static RouteGroupBuilder MapProjects(this RouteGroupBuilder group)
         {
-            group.MapGet("/", GetProjectsAsync)
+            group.MapGet("/", GetAllAsync)
                 .CacheOutput(c => c.Expire(TimeSpan.FromSeconds(60)).Tag("projects-get"));
 
-            group.MapGet("/{id}", GetProjectByIdAsync);
+            group.MapGet("/{id}", GetByIdAsync);
 
-            group.MapPost("/", CreateProjectAsync);
+            group.MapPost("/", CreateAsync);
 
-            group.MapPut("/{id}", UpdateProjectAsync);
+            group.MapPut("/{id}", UpdateAsync);
 
-            group.MapDelete("/{id}", DeleteProjectAsync);
+            group.MapDelete("/{id}", DeleteAsync);
 
             return group;
         }
 
-        public static async Task<Ok<List<Project>>> GetProjectsAsync(IProjectsRepository repository)
+        public static async Task<Ok<List<ProjectDto>>> GetAllAsync(IProjectsRepository repository, IMapper mapper)
         {
             var projects = await repository.GetAll();
 
-            return TypedResults.Ok(projects.ToList());
+            var dtos = mapper.Map<List<ProjectDto>>(projects);
+
+            return TypedResults.Ok(dtos);
         }
 
-        public static async Task<Results<Ok<Project>, NotFound>> GetProjectByIdAsync(string id, IProjectsRepository repository)
+        public static async Task<Results<Ok<ProjectDto>, NotFound>> GetByIdAsync(string id, IProjectsRepository repository, IMapper mapper)
         {
             var project = await repository.GetById(id);
 
@@ -41,19 +45,27 @@ namespace MyProjects.Projects.Api.Endpoints
                 return TypedResults.NotFound();
             }
 
-            return TypedResults.Ok(project);
+
+            var projectDto = mapper.Map<ProjectDto>(project);   
+
+            return TypedResults.Ok(projectDto);
         }
 
-        public static async Task<Results<Created<Project>, BadRequest>> CreateProjectAsync(Project project, IProjectsRepository repository, IOutputCacheStore outputCacheStore)
+        public static async Task<Results<Created<ProjectDto>, BadRequest>> CreateAsync(CreateProjectDto projectDto, IProjectsRepository repository, IOutputCacheStore outputCacheStore, IMapper mapper)
         {
+
+            var project = mapper.Map<Project>(projectDto);
+
             var id = await repository.Create(project);
+
+            var dto = mapper.Map<ProjectDto>(project);
 
             await ClearRefCache(outputCacheStore);
 
-            return TypedResults.Created($"/{id}", project);
+            return TypedResults.Created($"/{id}", dto);
         }
 
-        public static async Task<Results<Ok<Project>, BadRequest>> UpdateProjectAsync(string id, Project project, IProjectsRepository repository, IOutputCacheStore outputCacheStore)
+        public static async Task<Results<Ok<ProjectDto>, BadRequest>> UpdateAsync(string id, UpdateProjectDto projectDto, IProjectsRepository repository, IOutputCacheStore outputCacheStore, IMapper mapper)
         {
             var exists = await repository.Exists(id);
 
@@ -62,14 +74,19 @@ namespace MyProjects.Projects.Api.Endpoints
                 return TypedResults.BadRequest();
             }
 
+            var project = mapper.Map<Project>(projectDto);
+
+
             await repository.Update(project);
+
+            var dto = mapper.Map<ProjectDto>(project);
 
             await ClearRefCache(outputCacheStore);
 
-            return TypedResults.Ok(project);
+            return TypedResults.Ok(dto);
         }
 
-        public static async Task<Results<NoContent, BadRequest>> DeleteProjectAsync(string id, IProjectsRepository repository, IOutputCacheStore outputCacheStore)
+        public static async Task<Results<NoContent, BadRequest>> DeleteAsync(string id, IProjectsRepository repository, IOutputCacheStore outputCacheStore)
         {
             var exists = await repository.Exists(id);
 

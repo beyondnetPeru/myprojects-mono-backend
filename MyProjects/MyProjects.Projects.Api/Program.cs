@@ -31,6 +31,9 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen();
 
+
+builder.Services.AddAutoMapper(typeof(Program));
+
 builder.Services.AddScoped<IProjectsRepository, ProjectsRepository>();  
 
 var app = builder.Build();
