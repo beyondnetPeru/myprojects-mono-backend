@@ -2,9 +2,9 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.OutputCaching;
-using MyProjects.Projects.Api.DTOs;
-using MyProjects.Projects.Api.Models;
-using MyProjects.Projects.Api.Repositories;
+using MyProjects.Application.Dtos.Project;
+using MyProjects.Domain.ProjectAggregate;
+
 
 namespace MyProjects.Projects.Api.Endpoints
 {
@@ -46,7 +46,7 @@ namespace MyProjects.Projects.Api.Endpoints
             }
 
 
-            var projectDto = mapper.Map<ProjectDto>(project);   
+            var projectDto = mapper.Map<ProjectDto>(project);
 
             return TypedResults.Ok(projectDto);
         }
@@ -56,13 +56,15 @@ namespace MyProjects.Projects.Api.Endpoints
 
             var project = mapper.Map<Project>(projectDto);
 
-            var id = await repository.Create(project);
+            project.Id = Guid.NewGuid().ToString();
+
+            await repository.Create(project);
 
             var dto = mapper.Map<ProjectDto>(project);
 
             await ClearRefCache(outputCacheStore);
 
-            return TypedResults.Created($"/{id}", dto);
+            return TypedResults.Created($"/{project.Id}", dto);
         }
 
         public static async Task<Results<Ok<ProjectDto>, BadRequest>> UpdateAsync(string id, UpdateProjectDto projectDto, IProjectsRepository repository, IOutputCacheStore outputCacheStore, IMapper mapper)
@@ -76,6 +78,7 @@ namespace MyProjects.Projects.Api.Endpoints
 
             var project = mapper.Map<Project>(projectDto);
 
+            project.Id = id;
 
             await repository.Update(project);
 
@@ -102,7 +105,7 @@ namespace MyProjects.Projects.Api.Endpoints
             return TypedResults.NoContent();
         }
 
-        static async Task ClearRefCache(IOutputCacheStore outputCacheStore)
+        static async System.Threading.Tasks.Task ClearRefCache(IOutputCacheStore outputCacheStore)
         {
             await outputCacheStore.EvictByTagAsync("projects-get", default);
         }

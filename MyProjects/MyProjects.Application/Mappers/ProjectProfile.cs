@@ -1,12 +1,13 @@
 ﻿using AutoMapper;
-using MyProjects.Projects.Api.DTOs;
-using MyProjects.Projects.Api.Models;
+using MyProjects.Application.Dtos.Project;
+using MyProjects.Domain.ProjectAggregate;
+
 
 namespace MyProjects.Projects.Api.Mapping
 {
-    public class AutoMapperProfiles : Profile
+    public class ProjectProfile : Profile
     {
-        public AutoMapperProfiles()
+        public ProjectProfile()
         {
             CreateMap<Project, ProjectDto>();
             CreateMap<ProjectDto, Project>();

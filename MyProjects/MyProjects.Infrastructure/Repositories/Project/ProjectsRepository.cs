@@ -1,8 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MyProjects.Projects.Api.Infrastructure.Database;
-using MyProjects.Projects.Api.Models;
+using MyProjects.Domain.ProjectAggregate;
 
-namespace MyProjects.Projects.Api.Repositories
+namespace MyProjects.Infrastructure.Database
 {
     public class ProjectsRepository : IProjectsRepository
     {
@@ -32,10 +31,12 @@ namespace MyProjects.Projects.Api.Repositories
 
         public async Task<Project?> GetById(string id)
         {
-            return await context.Projects.FirstOrDefaultAsync(x => x.Id == id);
+            var project = await context.Projects.FirstOrDefaultAsync(x => x.Id == id);
+
+            return null;
         }
 
-        public async Task Update(Project project)
+        public async System.Threading.Tasks.Task Update(Project project)
         {
             context.Update(project);
             await context.SaveChangesAsync();
@@ -45,8 +46,8 @@ namespace MyProjects.Projects.Api.Repositories
         {
             var data = await context.Projects.ToListAsync();
 
-             return data.AsQueryable().OrderBy(p => p.Name);
-            
+            return (IEnumerable<Project>)data.AsQueryable().OrderBy(p => p.Name);
+
         }
     }
 }

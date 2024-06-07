@@ -1,6 +1,4 @@
-﻿using MyProjects.Projects.Api.Models;
-
-namespace MyProjects.Projects.Api.Repositories
+﻿namespace MyProjects.Domain.ProjectAggregate
 {
     public interface IProjectsRepository
     {

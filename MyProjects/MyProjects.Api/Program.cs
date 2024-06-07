@@ -1,10 +1,8 @@
-using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.EntityFrameworkCore;
+using MyProjects.Domain.ProjectAggregate;
+using MyProjects.Infrastructure.Database;
 using MyProjects.Projects.Api.Endpoints;
-using MyProjects.Projects.Api.Infrastructure.Database;
-using MyProjects.Projects.Api.Models;
-using MyProjects.Projects.Api.Repositories;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,7 +32,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddAutoMapper(typeof(Program));
 
-builder.Services.AddScoped<IProjectsRepository, ProjectsRepository>();  
+builder.Services.AddScoped<IProjectsRepository, ProjectsRepository>();
 
 var app = builder.Build();
 
