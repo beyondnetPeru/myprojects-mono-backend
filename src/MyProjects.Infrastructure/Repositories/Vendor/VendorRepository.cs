@@ -1,21 +1,28 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using MyProjects.Domain.VendorAggregate;
 using MyProjects.Infrastructure.Database;
+using MyProjects.Shared.Application.Extensions;
+using MyProjects.Shared.Infrastructure.Database;
 
 namespace MyProjects.Infrastructure.Repositories.Vendor
 {
-    public class VendorRepository(ApplicationDbContext context, IMapper mapper) : IVendorRepository
+    public class VendorRepository(ApplicationDbContext context, IMapper mapper, IHttpContextAccessor httpContextAccessor) : IVendorRepository
     {
-
-        public async Task<IEnumerable<Domain.VendorAggregate.Vendor>> GetAll()
+        public async Task<IEnumerable<Domain.VendorAggregate.Vendor>> GetAll(Shared.Application.Pagination.PaginationDto pagination)
         {
-            var vendorsTable = await context.Vendors.ToListAsync();
+            var queryable = context.Vendors.AsQueryable();
 
-            var vendorsDomain = mapper.Map<IEnumerable<Domain.VendorAggregate.Vendor>>(vendorsTable);
+            await httpContextAccessor.HttpContext!.AddPaginationInHeader(queryable);
 
-            return vendorsDomain;
+            var data = await queryable.OrderBy(v => v.Name).Paginate(pagination).ToListAsync();
+
+            var vendors = mapper.Map<IEnumerable<Domain.VendorAggregate.Vendor>>(data);
+
+            return vendors;
         }
+
 
         public async Task<Domain.VendorAggregate.Vendor> GetById(string id)
         {
@@ -50,5 +57,7 @@ namespace MyProjects.Infrastructure.Repositories.Vendor
         {
             return context.Vendors.Where(vendor => vendor.Id == id).ExecuteDeleteAsync();
         }
+
+      
     }
 }

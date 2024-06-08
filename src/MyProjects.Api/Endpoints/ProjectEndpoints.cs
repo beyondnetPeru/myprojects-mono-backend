@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.OutputCaching;
 using MyProjects.Application.Dtos.Project;
 using MyProjects.Application.Dtos.Vendor;
 using MyProjects.Domain.ProjectAggregate;
+using MyProjects.Shared.Application.Pagination;
 using MyProjects.Shared.Infrastructure.FileStorage;
 using System.Collections.Generic;
 
@@ -20,6 +21,8 @@ namespace MyProjects.Projects.Api.Endpoints
             group.MapGet("/", GetAllAsync)
                 .CacheOutput(c => c.Expire(TimeSpan.FromSeconds(60)).Tag("projects-get"));
 
+            group.MapGet("/name/{name}", GetByNameAsync);
+
             group.MapGet("/{id}", GetByIdAsync);
 
             group.MapPost("/", CreateAsync);
@@ -28,12 +31,32 @@ namespace MyProjects.Projects.Api.Endpoints
 
             group.MapDelete("/{id}", DeleteAsync);
 
+            group.MapGet("/{projectId}/vendors", GetVendorsAsync);
+
+            group.MapGet("/{projectId}/vendors/{vendorId}", GetVendorByIdAsync);
+
+            group.MapPost("/{projectId}/vendors", AddVendorAsync);
+
+            group.MapDelete("/{projectId}/vendors/{vendorId}", RemoveVendorAsync);
+
+
             return group;
         }
 
-        public static async Task<Ok<List<ProjectDto>>> GetAllAsync(IProjectsRepository repository, IMapper mapper)
+        public static async Task<Ok<List<ProjectDto>>> GetAllAsync(IProjectsRepository repository, IMapper mapper, int page=1, int recordsPerPage = 10)
         {
-            var projects = await repository.GetAll();
+            var pagination = new PaginationDto { Page = page, RecordsPerPage = recordsPerPage }; 
+
+            var projects = await repository.GetAll(pagination);
+
+            var dtos = mapper.Map<List<ProjectDto>>(projects);
+
+            return TypedResults.Ok(dtos);
+        }
+
+        public static async Task<Ok<List<ProjectDto>>> GetByNameAsync(string name, IProjectsRepository repository, IMapper mapper)
+        {
+            var projects = await repository.GetByName(name);
 
             var dtos = mapper.Map<List<ProjectDto>>(projects);
 
@@ -125,6 +148,20 @@ namespace MyProjects.Projects.Api.Endpoints
             var vendorsDto = mapper.Map<List<VendorDto>>(vendors);
 
             return TypedResults.Ok(vendorsDto);
+        }
+
+        public static async Task<Results<Ok<VendorDto>, NotFound>> GetVendorByIdAsync(string projectId, string vendorId, IProjectsRepository repository, IMapper mapper)
+        {
+            var vendor = await repository.GetVendorById(projectId, vendorId);
+
+            if (vendor == null)
+            {
+                return TypedResults.NotFound();
+            }
+
+            var vendorDto = mapper.Map<VendorDto>(vendor);
+
+            return TypedResults.Ok(vendorDto);
         }
 
         public static async Task<Results<Created<VendorDto>, BadRequest>> AddVendorAsync(string projectId, CreateVendorDto vendorDto, IProjectsRepository repository, IMapper mapper)

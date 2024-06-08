@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.OutputCaching;
 using MyProjects.Application.Dtos.Vendor;
 using MyProjects.Domain.VendorAggregate;
-using System.Reflection.Metadata.Ecma335;
+using MyProjects.Shared.Application.Pagination;
 
 namespace MyProjects.Api.Endpoints
 {
@@ -25,9 +25,11 @@ namespace MyProjects.Api.Endpoints
             return group;
         }
 
-        public static async Task<Ok<List<VendorDto>>> GetAllAsync(IVendorRepository repository, IMapper mapper)
+        public static async Task<Ok<List<VendorDto>>> GetAllAsync(IVendorRepository repository, IMapper mapper, int page=1, int recordsPerPage=10)
         {
-            var vendors = await repository.GetAll();
+            var pagination = new PaginationDto { Page = page, RecordsPerPage = recordsPerPage };
+
+            var vendors = await repository.GetAll(pagination);
 
             var dtos = mapper.Map<List<VendorDto>>(vendors);
 

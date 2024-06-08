@@ -1,23 +1,37 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-
 using MyProjects.Domain.ProjectAggregate;
 using MyProjects.Infrastructure.Database.Tables;
+using MyProjects.Shared.Application.Extensions;
+using MyProjects.Shared.Application.Pagination;
+using MyProjects.Shared.Infrastructure.Database;
 
 
 namespace MyProjects.Infrastructure.Database
 {
-    public class ProjectsRepository(ApplicationDbContext context, IMapper mapper) : IProjectsRepository
+    public class ProjectsRepository(ApplicationDbContext context, IMapper mapper, IHttpContextAccessor httpContextAccessor) : IProjectsRepository
     {
-
-        public async Task<IEnumerable<Project>> GetAll()
+        public async Task<IEnumerable<Project>> GetAll(PaginationDto pagination)
         {
-            var prjectsTable = await context.Projects.ToListAsync();
+            var queryable = context.Projects.AsQueryable();
 
-            var projectsDomain = mapper.Map<IEnumerable<Project>>(prjectsTable);
+            await httpContextAccessor.HttpContext!.AddPaginationInHeader(queryable);
+
+            var data = await queryable.OrderBy(p => p.Name).Paginate(pagination).ToListAsync();
+
+            var projects = mapper.Map<IEnumerable<Project>>(data);
+
+            return projects;
+        }
+
+        public async Task<IEnumerable<Project>> GetByName(string name)
+        {
+            var projectsTable = await context.Projects.Where(x => x.Name.Contains(name)).OrderBy(p => p.Name).ToListAsync();
+
+            var projectsDomain = mapper.Map<IEnumerable<Project>>(projectsTable);
 
             return projectsDomain;
-
         }
 
         public async Task<Project> GetById(string id)
@@ -60,6 +74,13 @@ namespace MyProjects.Infrastructure.Database
             return Task.FromResult(mapper.Map<IEnumerable<ProjectVendor>>(vendors));
         }
 
+        public async Task<ProjectVendor> GetVendorById(string projectId, string vendorId)
+        {
+            var vendor = await context.ProjectVendors.FirstOrDefaultAsync(x => x.ProjectId == projectId && x.VendorId == vendorId);
+
+            return mapper.Map<ProjectVendor>(vendor);
+        }
+
         public async Task AddVendor(ProjectVendor vendor)
         {
             var projectVendor = mapper.Map<ProjectVendorTable>(vendor);
@@ -72,7 +93,6 @@ namespace MyProjects.Infrastructure.Database
         public async Task RemoveVendor(string projectId, string vendorId)
         {
             await context.ProjectVendors.Where(x => x.ProjectId == projectId && x.VendorId == vendorId).ExecuteDeleteAsync();
-        }
-
+        }                
     }
 }
