@@ -3,13 +3,17 @@ using AutoMapper;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.OutputCaching;
 using MyProjects.Application.Dtos.Project;
+using MyProjects.Application.Dtos.Vendor;
 using MyProjects.Domain.ProjectAggregate;
+using MyProjects.Shared.Infrastructure.FileStorage;
+using System.Collections.Generic;
 
 
 namespace MyProjects.Projects.Api.Endpoints
 {
     public static class ProjectEndpoints
     {
+        private readonly static string _container = "projects";
 
         public static RouteGroupBuilder MapProjects(this RouteGroupBuilder group)
         {
@@ -51,12 +55,21 @@ namespace MyProjects.Projects.Api.Endpoints
             return TypedResults.Ok(projectDto);
         }
 
-        public static async Task<Results<Created<ProjectDto>, BadRequest>> CreateAsync(CreateProjectDto projectDto, IProjectsRepository repository, IOutputCacheStore outputCacheStore, IMapper mapper)
+        public static async Task<Results<Created<ProjectDto>, BadRequest>> CreateAsync(CreateProjectDto projectDto, IProjectsRepository repository,
+                                                                                       IOutputCacheStore outputCacheStore, IMapper mapper, IFileStorage fileStorage)
         {
 
             var project = mapper.Map<Project>(projectDto);
 
+            if (projectDto.Image != null)
+            {
+                var image = await fileStorage.Store(_container, projectDto.Image);
+
+                project.Image = image;
+            }
+
             project.Id = Guid.NewGuid().ToString();
+
 
             await repository.Create(project);
 
@@ -105,7 +118,36 @@ namespace MyProjects.Projects.Api.Endpoints
             return TypedResults.NoContent();
         }
 
-        static async System.Threading.Tasks.Task ClearRefCache(IOutputCacheStore outputCacheStore)
+        public static async Task<Ok<List<VendorDto>>> GetVendorsAsync(string projectId, IProjectsRepository repository, IMapper mapper)
+        {
+            var vendors = await repository.GetVendors(projectId);
+
+            var vendorsDto = mapper.Map<List<VendorDto>>(vendors);
+
+            return TypedResults.Ok(vendorsDto);
+        }
+
+        public static async Task<Results<Created<VendorDto>, BadRequest>> AddVendorAsync(string projectId, CreateVendorDto vendorDto, IProjectsRepository repository, IMapper mapper)
+        {
+            var vendor = mapper.Map<ProjectVendor>(vendorDto);
+
+            vendor.ProjectId = projectId;
+
+            await repository.AddVendor(vendor);
+
+            var dto = mapper.Map<VendorDto>(vendor);
+
+            return TypedResults.Created($"/{projectId}/vendors/{vendor.VendorId}", dto);
+        }
+
+        public static async Task<Results<NoContent, BadRequest>> RemoveVendorAsync(string projectId, string vendorId, IProjectsRepository repository)
+        {
+            await repository.RemoveVendor(projectId, vendorId);
+
+            return TypedResults.NoContent();
+        }
+
+        static async Task ClearRefCache(IOutputCacheStore outputCacheStore)
         {
             await outputCacheStore.EvictByTagAsync("projects-get", default);
         }

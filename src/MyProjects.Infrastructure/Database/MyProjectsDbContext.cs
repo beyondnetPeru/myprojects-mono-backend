@@ -18,11 +18,18 @@ namespace MyProjects.Infrastructure.Database
             modelBuilder.Entity<ProjectTable>().Property(p => p.Name).IsRequired();
             modelBuilder.Entity<ProjectTable>().Property(p => p.Picture).IsUnicode();
 
-            modelBuilder.Entity<ProjectTable>().HasMany(p => p.Vendors).WithMany(p => p.Projects)
-                .UsingEntity("ProjectVendors",
-                v => v.HasOne(typeof(VendorTable)).WithMany().HasForeignKey("VendorId").HasPrincipalKey(nameof(VendorTable.Id)),
-                p => p.HasOne(typeof(ProjectTable)).WithMany().HasForeignKey("ProjectId").HasPrincipalKey(nameof(ProjectTable.Id)),
-                k => k.HasKey("ProjectId", "VendorId"));
+
+
+            modelBuilder.Entity<ProjectVendorTable>().HasKey(p => new { p.ProjectId, p.VendorId });
+            modelBuilder.Entity<ProjectVendorTable>()
+                        .HasOne(p => p.Project)
+                        .WithMany(v => v.Vendors)
+                        .HasForeignKey(p => p.ProjectId);
+
+            modelBuilder.Entity<ProjectVendorTable>()
+                        .HasOne(v => v.Vendor)
+                        .WithMany(p => p.Projects)
+                        .HasForeignKey(v => v.VendorId);
 
 
             modelBuilder.Entity<VendorTable>().HasKey(p => p.Id);
@@ -33,6 +40,7 @@ namespace MyProjects.Infrastructure.Database
 
         public DbSet<ProjectTable> Projects { get; set; }
         public DbSet<VendorTable> Vendors { get; set; }
+        public DbSet<ProjectVendorTable> ProjectVendors { get; set; }
 
     }
 }

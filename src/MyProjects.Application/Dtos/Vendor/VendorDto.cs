@@ -1,4 +1,6 @@
-﻿namespace MyProjects.Application.Dtos.Vendor
+﻿using Microsoft.AspNetCore.Http;
+
+namespace MyProjects.Application.Dtos.Vendor
 {
     public class VendorDto
     {
@@ -7,6 +9,7 @@
         public string? Description { get; set; }
         public string Email { get; set; } = string.Empty;
         public string? Phone { get; set; }
+        public IFormFile? Picture { get; set; }
         public int Status { get; set; }
     }
 }

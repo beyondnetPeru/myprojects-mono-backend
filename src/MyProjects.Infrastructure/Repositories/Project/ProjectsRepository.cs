@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 
 using MyProjects.Domain.ProjectAggregate;
+using MyProjects.Infrastructure.Database.Tables;
 
 
 namespace MyProjects.Infrastructure.Database
@@ -41,8 +42,6 @@ namespace MyProjects.Infrastructure.Database
         }
 
 
-
-
         public async Task Update(Project project)
         {
             context.Update(project);
@@ -53,5 +52,27 @@ namespace MyProjects.Infrastructure.Database
         {
             await context.Projects.Where(Projects => Projects.Id == id).ExecuteDeleteAsync();
         }
+
+        public Task<IEnumerable<ProjectVendor>> GetVendors(string projectId)
+        {
+            var vendors = context.ProjectVendors.Select(x => x.ProjectId == projectId);
+
+            return Task.FromResult(mapper.Map<IEnumerable<ProjectVendor>>(vendors));
+        }
+
+        public async Task AddVendor(ProjectVendor vendor)
+        {
+            var projectVendor = mapper.Map<ProjectVendorTable>(vendor);
+
+            context.Add(projectVendor);
+
+            await context.SaveChangesAsync();
+        }
+
+        public async Task RemoveVendor(string projectId, string vendorId)
+        {
+            await context.ProjectVendors.Where(x => x.ProjectId == projectId && x.VendorId == vendorId).ExecuteDeleteAsync();
+        }
+
     }
 }

@@ -9,7 +9,7 @@
         public string Email { get; set; } = string.Empty;
         public string? Phone { get; set; }
 
-        public IEnumerable<ProjectTable>? Projects { get; set; }
+        public ICollection<ProjectVendorTable>? Projects { get; set; }
         public int Status { get; set; } = 1;
     }
 }

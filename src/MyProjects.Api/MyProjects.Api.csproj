@@ -27,4 +27,8 @@
 	  <ProjectReference Include="..\MyProjects.Shared\MyProjects.Shared.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="wwwroot\" />
+	</ItemGroup>
+
 </Project>
