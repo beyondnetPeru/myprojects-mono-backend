@@ -1,17 +1,32 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using MyProjects.Infrastructure.Database.Tables;
 
 namespace MyProjects.Infrastructure.Database
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext
     {
+        public DbSet<ProjectTable> Projects { get; set; }
+        public DbSet<VendorTable> Vendors { get; set; }
+        public DbSet<ProjectVendorTable> ProjectVendors { get; set; }
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
-        {
+        {            
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<IdentityUser>().ToTable("Users");
+            modelBuilder.Entity<IdentityRole>().ToTable("Roles");
+            modelBuilder.Entity<IdentityUserRole<string>>().ToTable("UserRoles");
+            modelBuilder.Entity<IdentityUserClaim<string>>().ToTable("UserClaims");
+            modelBuilder.Entity<IdentityUserLogin<string>>().ToTable("UserLogins");
+            modelBuilder.Entity<IdentityRoleClaim<string>>().ToTable("RoleClaims");
+            modelBuilder.Entity<IdentityUserToken<string>>().ToTable("UserTokens");
+
 
             modelBuilder.Entity<ProjectTable>().HasKey(p => p.Id);
             modelBuilder.Entity<ProjectTable>().Property(p => p.Id).HasMaxLength(36);
@@ -38,9 +53,6 @@ namespace MyProjects.Infrastructure.Database
         }
 
 
-        public DbSet<ProjectTable> Projects { get; set; }
-        public DbSet<VendorTable> Vendors { get; set; }
-        public DbSet<ProjectVendorTable> ProjectVendors { get; set; }
 
     }
 }

@@ -1,9 +1,11 @@
 ﻿
 using AutoMapper;
+using FluentValidation;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.OutputCaching;
 using MyProjects.Application.Dtos.Project;
 using MyProjects.Application.Dtos.Vendor;
+using MyProjects.Application.Validators;
 using MyProjects.Domain.ProjectAggregate;
 using MyProjects.Shared.Application.Pagination;
 using MyProjects.Shared.Infrastructure.FileStorage;
@@ -21,7 +23,7 @@ namespace MyProjects.Projects.Api.Endpoints
             group.MapGet("/", GetAllAsync)
                 .CacheOutput(c => c.Expire(TimeSpan.FromSeconds(60)).Tag("projects-get"));
 
-            group.MapGet("/name/{name}", GetByNameAsync);
+            group.MapGet("/name/{name}", GetByNameAsync).RequireAuthorization();
 
             group.MapGet("/{id}", GetByIdAsync);
 
@@ -78,9 +80,16 @@ namespace MyProjects.Projects.Api.Endpoints
             return TypedResults.Ok(projectDto);
         }
 
-        public static async Task<Results<Created<ProjectDto>, BadRequest>> CreateAsync(CreateProjectDto projectDto, IProjectsRepository repository,
-                                                                                       IOutputCacheStore outputCacheStore, IMapper mapper, IFileStorage fileStorage)
+        public static async Task<Results<Created<ProjectDto>, ValidationProblem>> CreateAsync(CreateProjectDto projectDto, IProjectsRepository repository,
+                                                                                       IOutputCacheStore outputCacheStore, IMapper mapper, IFileStorage fileStorage, 
+                                                                                       IValidator<CreateProjectDto> validator)
         {
+            var validationResult = await validator.ValidateAsync(projectDto);
+
+            if (!validationResult.IsValid)
+            {
+                return TypedResults.ValidationProblem(validationResult.ToDictionary());
+            }
 
             var project = mapper.Map<Project>(projectDto);
 
