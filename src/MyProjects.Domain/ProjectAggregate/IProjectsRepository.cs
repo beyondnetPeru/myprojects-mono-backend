@@ -1,5 +1,4 @@
-﻿using MyProjects.Shared.Application.Pagination;
-using MyProjects.Shared.Domain;
+﻿using Ddd.Interfaces;
 
 namespace MyProjects.Domain.ProjectAggregate
 {
@@ -7,7 +6,7 @@ namespace MyProjects.Domain.ProjectAggregate
     {
         Task<IEnumerable<ProjectVendor>> GetVendors(string projectId);
         Task<ProjectVendor> GetVendorById(string projectId, string vendorId);
-        Task AddVendor(ProjectVendor vendor);
+        Task AddVendor(ProjectVendor item);
         Task RemoveVendor(string projectId, string vendorId);
         Task<IEnumerable<Project>> GetByName(string name);
     }

@@ -1,14 +1,15 @@
 ﻿using AutoMapper;
+using Ddd.Dtos;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using MyProjects.Domain.ProjectAggregate;
+using MyProjects.Infrastructure.Database;
 using MyProjects.Infrastructure.Database.Tables;
 using MyProjects.Shared.Application.Extensions;
-using MyProjects.Shared.Application.Pagination;
 using MyProjects.Shared.Infrastructure.Database;
 
 
-namespace MyProjects.Infrastructure.Database
+namespace MyProjects.Infrastructure.Repositories.Projects
 {
     public class ProjectsRepository(ApplicationDbContext context, IMapper mapper, IHttpContextAccessor httpContextAccessor) : IProjectsRepository
     {

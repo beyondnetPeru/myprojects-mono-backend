@@ -1,10 +1,12 @@
 using FluentValidation;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MyProjects.Api.Endpoints;
 using MyProjects.Domain.ProjectAggregate;
 using MyProjects.Domain.VendorAggregate;
 using MyProjects.Infrastructure.Database;
-using MyProjects.Infrastructure.Repositories.Vendor;
+using MyProjects.Infrastructure.Repositories.Projects;
+using MyProjects.Infrastructure.Repositories.Vendors;
 using MyProjects.Projects.Api.Endpoints;
 using MyProjects.Shared.Infrastructure.FileStorage;
 
@@ -12,9 +14,15 @@ using MyProjects.Shared.Infrastructure.FileStorage;
 var builder = WebApplication.CreateBuilder(args);
 
 // Services
-
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer("name=DefaultConnection"));
+
+builder.Services.AddIdentityCore<IdentityUser>()
+                    .AddEntityFrameworkStores<ApplicationDbContext>()
+                    .AddDefaultTokenProviders();
+
+builder.Services.AddScoped<UserManager<IdentityUser>>();
+builder.Services.AddScoped<SignInManager<IdentityUser>>();
 
 builder.Services.AddCors(options =>
 {

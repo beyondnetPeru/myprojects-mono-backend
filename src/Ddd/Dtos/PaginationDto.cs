@@ -1,4 +1,4 @@
-﻿namespace MyProjects.Shared.Application.Pagination
+﻿namespace Ddd.Dtos
 {
     public class PaginationDto
     {

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Ddd.Dtos;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using MyProjects.Domain.VendorAggregate;
@@ -6,11 +7,11 @@ using MyProjects.Infrastructure.Database;
 using MyProjects.Shared.Application.Extensions;
 using MyProjects.Shared.Infrastructure.Database;
 
-namespace MyProjects.Infrastructure.Repositories.Vendor
+namespace MyProjects.Infrastructure.Repositories.Vendors    
 {
     public class VendorRepository(ApplicationDbContext context, IMapper mapper, IHttpContextAccessor httpContextAccessor) : IVendorRepository
     {
-        public async Task<IEnumerable<Domain.VendorAggregate.Vendor>> GetAll(Shared.Application.Pagination.PaginationDto pagination)
+        public async Task<IEnumerable<Vendor>> GetAll(PaginationDto pagination)
         {
             var queryable = context.Vendors.AsQueryable();
 

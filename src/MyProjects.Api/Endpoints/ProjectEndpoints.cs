@@ -1,15 +1,13 @@
 ﻿
 using AutoMapper;
+using Ddd.Dtos;
 using FluentValidation;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.OutputCaching;
 using MyProjects.Application.Dtos.Project;
 using MyProjects.Application.Dtos.Vendor;
-using MyProjects.Application.Validators;
 using MyProjects.Domain.ProjectAggregate;
-using MyProjects.Shared.Application.Pagination;
 using MyProjects.Shared.Infrastructure.FileStorage;
-using System.Collections.Generic;
 
 
 namespace MyProjects.Projects.Api.Endpoints

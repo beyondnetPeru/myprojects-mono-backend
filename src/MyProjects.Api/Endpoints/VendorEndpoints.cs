@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
+using Ddd.Dtos;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.OutputCaching;
 using MyProjects.Application.Dtos.Vendor;
 using MyProjects.Domain.VendorAggregate;
-using MyProjects.Shared.Application.Pagination;
 
 namespace MyProjects.Api.Endpoints
 {

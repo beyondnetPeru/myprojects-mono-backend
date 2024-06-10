@@ -7,8 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Ddd\Ddd.csproj" />
-    <ProjectReference Include="..\MyProjects.Shared\MyProjects.Shared.csproj" />
+    <Folder Include="Impl\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" Version="12.3.0" />
   </ItemGroup>
 
 </Project>

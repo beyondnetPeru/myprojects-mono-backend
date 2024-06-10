@@ -1,4 +1,4 @@
-﻿using MyProjects.Shared.Domain;
+﻿using Ddd.Interfaces;
 
 namespace MyProjects.Domain.VendorAggregate
 {

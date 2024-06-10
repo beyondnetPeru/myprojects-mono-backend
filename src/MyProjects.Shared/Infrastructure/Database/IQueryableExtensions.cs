@@ -1,4 +1,4 @@
-﻿using MyProjects.Shared.Application.Pagination;
+﻿using Ddd.Dtos;
 
 namespace MyProjects.Shared.Infrastructure.Database
 {
