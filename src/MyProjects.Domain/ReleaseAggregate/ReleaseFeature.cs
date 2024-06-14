@@ -14,7 +14,7 @@ namespace MyProjects.Domain.ReleaseAggregate
         public List<ReleaseFeatureRollout> Rollouts { get; set; }
         public ReleaseFeatureStatus FeatureStatus { get; set; }
 
-        public ReleaseFeature(IdValueObject projectId, StringValueObject featureName)
+        private ReleaseFeature(IdValueObject projectId, StringValueObject featureName)
         {
             ProjectId = projectId;            
             FeatureName = featureName;
@@ -23,6 +23,11 @@ namespace MyProjects.Domain.ReleaseAggregate
             Phases = new List<ReleaseFeaturePhase>();
             Comments = new List<ReleaseFeatureComment>();
             Rollouts = new List<ReleaseFeatureRollout>();
+        }
+
+        public static ReleaseFeature Create(IdValueObject projectId, StringValueObject featureName)
+        {
+            return new ReleaseFeature(projectId, featureName);
         }
     }
 }
