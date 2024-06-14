@@ -1,23 +1,25 @@
 ﻿
+using Ddd;
+using Ddd.ValueObjects;
+
 namespace MyProjects.Domain.ReleaseAggregate
 {
-    public class ReleaseFeature
+    public class ReleaseFeature :  Entity<ReleaseFeature>
     {
-        public string ProjectId { get; set; } = string.Empty;
-        public string FeatureId { get; set; } = string.Empty;
-        public string FeatureName { get; set; } = string.Empty;
-        public string FeatureDescription { get; set; } = string.Empty;
+        public IdValueObject ProjectId { get; set; }        
+        public StringValueObject FeatureName { get; set; }
+        public StringValueObject? FeatureDescription { get; set; }
         public List<ReleaseFeaturePhase> Phases { get; set; }
         public List<ReleaseFeatureComment> Comments { get; set; }
         public List<ReleaseFeatureRollout> Rollouts { get; set; }
-        public string FeatureStatus { get; set; } = string.Empty;
+        public ReleaseFeatureStatus FeatureStatus { get; set; }
 
-        public ReleaseFeature(string projectId, string featureId, string featureName, string featureDescription)
+        public ReleaseFeature(IdValueObject projectId, StringValueObject featureName)
         {
-            ProjectId = projectId;
-            FeatureId = featureId;
+            ProjectId = projectId;            
             FeatureName = featureName;
-            FeatureDescription = featureDescription;
+            FeatureDescription = StringValueObject.Create(string.Empty);
+
             Phases = new List<ReleaseFeaturePhase>();
             Comments = new List<ReleaseFeatureComment>();
             Rollouts = new List<ReleaseFeatureRollout>();

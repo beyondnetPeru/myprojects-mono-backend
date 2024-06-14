@@ -3,8 +3,10 @@
 
 namespace MyProjects.Domain.ReleaseAggregate
 {
-    public class ReleaseFeatureRolloutCountry: StringValueObject
+    public class ReleaseFeatureRolloutCountry : StringValueObject
     {
-
+        protected ReleaseFeatureRolloutCountry(string value) : base(value)
+        {
+        }
     }
 }

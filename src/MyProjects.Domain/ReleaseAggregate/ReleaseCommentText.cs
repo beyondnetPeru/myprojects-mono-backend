@@ -4,5 +4,8 @@ namespace MyProjects.Domain.ReleaseAggregate
 {
     public class ReleaseCommentText : StringValueObject
     {
+        protected ReleaseCommentText(string value) : base(value)
+        {
+        }
     }
 }

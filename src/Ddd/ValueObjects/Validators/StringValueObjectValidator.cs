@@ -6,10 +6,9 @@ namespace Ddd.ValueObjects.Validators
     {
         public StringValueObjectValidator()
         {
-            RuleFor(x => x)
-                .NotEmpty()
+            RuleFor(x => x)                
                 .NotNull()
-                .WithMessage("Value cannot be null or empty.");
+                .WithMessage("Value cannot be null.");
         }
     }
 }

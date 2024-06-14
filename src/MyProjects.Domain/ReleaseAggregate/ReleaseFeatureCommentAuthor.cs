@@ -2,7 +2,10 @@
 
 namespace MyProjects.Domain.ReleaseAggregate
 {
-    public  class ReleaseFeatureCommentAuthor : StringValueObject
+    public class ReleaseFeatureCommentAuthor : StringValueObject
     {
+        protected ReleaseFeatureCommentAuthor(string value) : base(value)
+        {
+        }
     }
 }
