@@ -11,4 +11,11 @@
     <ProjectReference Include="..\MyProjects.Shared\MyProjects.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="BacklogAggregate\" />
+    <Folder Include="CalendarAggregate\" />
+    <Folder Include="ProductAggregate\" />
+    <Folder Include="ReleaseAggregate\Validators\" />
+  </ItemGroup>
+
 </Project>

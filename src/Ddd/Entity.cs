@@ -1,34 +1,124 @@
-﻿using MediatR;
+﻿using Ddd.ValueObjects;
+using FluentValidation.Results;
+using FluentValidation;
+using MediatR;
+using Ddd.Interfaces;
 
 namespace Ddd
 {
-    public class Entity
+    public class Entity<T>
     {
+        #region Members 
         int? _requestedHashCode;
 
-        private List<INotification> _domainEvents;
+        private List<AbstractValidator<T>>? _businessRules;
 
-        private string _id;
+        private List<ValidationFailure> _brokenRules;
+
+        #endregion
+
+        #region Properties
+
+        public IdValueObject Id { get; private set; }
+        public AuditValueObject? Audit { get; set; }
+        public TrackingEntity Traking { get; private set; } = default;
+
+        #endregion
+
+        #region Properties
+
+        public bool IsValid => _brokenRules!.Any();
+
+        #endregion
+
+        #region Constructor
+
+        protected Entity()
+        {
+            _businessRules = new List<AbstractValidator<T>>();
+            _brokenRules = new List<ValidationFailure>();
+
+            Id = IdValueObject.Create();
+
+            SetNew();            
+        }
+
+        #endregion
+
+        #region Traking
+
+        public void SetNew()
+        {
+            Traking = new TrackingEntity { New = true, Dirty = false };
+
+            // TODO: Get user by context
+            Audit = AuditValueObject.Create("default");
+        }
+
+        public void SetDirty()
+        {
+            Traking = new TrackingEntity { New = false, Dirty = true };
+
+            // TODO: Get user by context
+            Audit = AuditValueObject.Create("default");
+        }
+
+        #endregion
+
+        #region Business Rules
+        public void AddBusinessRule(AbstractValidator<T> rule)
+        {
+            ArgumentNullException.ThrowIfNull(rule, nameof(rule));
+
+            _businessRules?.Add(rule);
+        }
+
+        public void AddBusinessRules(IEnumerable<AbstractValidator<T>> rules)
+        {
+            ArgumentNullException.ThrowIfNull(rules, nameof(rules));
+
+            _businessRules?.AddRange(rules);
+        }
+
+        public void AddBrokenRule(string propertyName, string message)
+        {
+            _brokenRules.Add(new ValidationFailure(propertyName, message));
+        }
+
+        public void Validate(T item)
+        {
+            ValidationResult result;
+
+            if (_businessRules == null)
+            {
+                return;
+            }
+
+            foreach (var rule in _businessRules)
+            {
+                result = rule.Validate(item);
+
+                if (!result.IsValid)
+                {
+                    _brokenRules.AddRange(result.Errors);
+                }
+            }
+        }
+
+        public IReadOnlyCollection<ValidationFailure> GetBrokenRules()
+        {
+            return _brokenRules.AsReadOnly();
+        }
+
+        #endregion
+
+        #region DomainEvents
+
+        private List<INotification> _domainEvents = new List<INotification>();
+        private TrackingEntity traking;
 
         public IReadOnlyCollection<INotification> DomainEvents => _domainEvents.AsReadOnly();
-
-        public virtual string Id
-        {
-            get
-            {
-                return _id;
-            }
-            set
-            {
-                _id = value;
-            }
-        }
-
-        public Entity()
-        {
-
-        }
-
+        
         public void AddDomainEvent(INotification eventItem)
         {
             _domainEvents = _domainEvents ?? new List<INotification>();
@@ -45,14 +135,12 @@ namespace Ddd
             _domainEvents?.Clear();
         }
 
-        public bool IsTransient()
-        {
-            return Id == default;
-        }
+        #endregion
 
+        #region Equality
         public override bool Equals(object obj)
         {
-            if (obj == null || !(obj is Entity))
+            if (obj == null || !(obj is Entity<T>))
                 return false;
 
             if (ReferenceEquals(this, obj))
@@ -61,28 +149,18 @@ namespace Ddd
             if (GetType() != obj.GetType())
                 return false;
 
-            Entity item = (Entity)obj;
+            Entity<T> item = (Entity<T>)obj;
 
-            if (item.IsTransient() || IsTransient())
-                return false;
-            else
-                return item.Id == Id;
+            
+            return item.Id == Id;
         }
 
         public override int GetHashCode()
         {
-            if (!IsTransient())
-            {
-                if (!_requestedHashCode.HasValue)
-                    _requestedHashCode = Id.GetHashCode() ^ 31; // XOR for random distribution (http://blogs.msdn.com/b/ericlippert/archive/2011/02/28/guidelines-and-rules-for-gethashcode.aspx)
-
-                return _requestedHashCode.Value;
-            }
-            else
-                return base.GetHashCode();
-
+           return base.GetHashCode();
         }
-        public static bool operator ==(Entity left, Entity right)
+
+        public static bool operator ==(Entity<T> left, Entity<T> right)
         {
             if (Equals(left, null))
                 return Equals(right, null) ? true : false;
@@ -90,9 +168,10 @@ namespace Ddd
                 return left.Equals(right);
         }
 
-        public static bool operator !=(Entity left, Entity right)
+        public static bool operator !=(Entity<T> left, Entity<T> right)
         {
             return !(left == right);
         }
+        #endregion
     }
 }

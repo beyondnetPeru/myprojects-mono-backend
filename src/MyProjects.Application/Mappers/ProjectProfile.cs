@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using MyProjects.Application.Dtos.Project;
-using MyProjects.Domain.ProjectAggregate;
+using MyProjects.Domain.ReleaseAggregate;
 
 
 namespace MyProjects.Projects.Api.Mapping
@@ -9,9 +9,9 @@ namespace MyProjects.Projects.Api.Mapping
     {
         public ProjectProfile()
         {
-            CreateMap<Project, ProjectDto>();
-            CreateMap<ProjectDto, Project>();
-            CreateMap<CreateProjectDto, Project>();
+            CreateMap<Release, ProjectDto>();
+            CreateMap<ProjectDto, Release>();
+            CreateMap<CreateProjectDto, Release>();
             CreateMap<UpdateProjectDto, ProjectDto>();
         }
     }
