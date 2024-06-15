@@ -3,8 +3,8 @@ namespace MyProjects.Domain.ReleaseAggregate
 {
     public enum ReleaseFeatureStatus
     {
-        NotStarted = 1,
-        InProgress = 2,
-        Completed = 3
+        Registered = 1,
+        OnHold = 2,
+        Canceled = 3,
     }
 }

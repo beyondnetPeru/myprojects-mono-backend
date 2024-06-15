@@ -1,9 +1,39 @@
-﻿namespace MyProjects.Domain.ReleaseAggregate
+﻿using Ddd;
+using Ddd.ValueObjects;
+
+namespace MyProjects.Domain.ReleaseAggregate
 {
-    public  class ReleaseFeatureComment
+    public  class ReleaseFeatureComment : Entity<ReleaseFeatureComment>
     {
-        public ReleaseFeatureCommentName Comment { get; set; } 
-        public ReleaseFeatureCommentAuthor Author { get; set; }
-        public ReleaseFeatureCommentDate Date { get; set; }
+        public StringValueObject Comment { get; set; } 
+        public StringValueObject Author { get; set; }
+        public StringValueObject Date { get; set; }
+
+        private ReleaseFeatureComment(StringValueObject comment, StringValueObject author, StringValueObject date)
+        {
+            Comment = comment;
+            Author = author;
+            Date = date;
+        }
+
+        public static ReleaseFeatureComment Create(StringValueObject comment, StringValueObject author, StringValueObject date)
+        {
+            return new ReleaseFeatureComment(comment, author, date);
+        }
+
+        public void UpdateComment(StringValueObject comment)
+        {
+            Comment = comment;
+        }
+
+        public void UpdateAuthor(StringValueObject author)
+        {
+            Author = author;
+        }
+
+        public void UpdateDate(StringValueObject date)
+        {
+            Date = date;
+        }
     }
 }

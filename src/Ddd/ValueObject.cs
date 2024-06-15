@@ -25,12 +25,25 @@ namespace Ddd
         {
             _businessRules = new List<AbstractValidator<T>>();
             _brokenRules = new List<ValidationFailure>();
+
+            Guard();
         }
 
         #endregion
 
         #region Business Rules
+        private void Guard()
+        {
+            var properties = this.GetType().GetProperties().Where(p =>
+                p.Name != "IsValid");
 
+            if (properties == null)
+            {
+                AddBrokenRule("ValueObject", "ValueObject must have at least one property to be validated.");
+                return;
+            }
+
+        }
         public void AddBusinessRule(AbstractValidator<T> rule)
         {
             ArgumentNullException.ThrowIfNull(rule, nameof(rule));

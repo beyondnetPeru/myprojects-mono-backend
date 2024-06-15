@@ -7,30 +7,35 @@ namespace MyProjects.Domain.ReleaseAggregate
 {
     public class Release : Entity<Release>, IAggregateRoot
     {
-        public ReleaseName Name { get; set; }
-        public ReleaseDescription Description { get; set; }
-        public ReleaseGoLiveDate? GoLiveDate { get; set; }
-        public ReleaseOwner? Owner { get; set; }
+        public StringValueObject Name { get; set; }
+        public StringValueObject Description { get; set; }
+        public DateTimeValueObject GoLiveDate { get; set; }
+        public StringValueObject? Owner { get; set; }
         public List<ReleaseFeature>? Features { get; set; }
         public List<ReleaseReference>? References { get; set; }
-        public List<ReleaseCommernt>? Comments { get; set; }
-        public ReleaseVersion? Version { get; private set; }
-        public ReleaseVersionName? VersionName { get; set; }
+        public List<ReleaseComment>? Comments { get; set; }
+        public ReleaseVersion Version { get; set; } 
+
         public ReleaseStatus Status { get; set; }
 
-        private Release(ReleaseName name, ReleaseDescription description)
+        private Release(StringValueObject name, StringValueObject description)
         {
             Name = name;
             Description = description;
+            GoLiveDate = DateTimeValueObject.Create(DateTime.Now);
+            Owner = StringValueObject.Create(string.Empty);
+            Version = ReleaseVersion.Create(StageEnum.Alpha,0,0,0);
+
             Features = new List<ReleaseFeature>();
             References = new List<ReleaseReference>();
-            Comments = new List<ReleaseCommernt>();
+            Comments = new List<ReleaseComment>();
+
             Status = ReleaseStatus.Created;
 
             AddDomainEvent(new ReleaseCreatedDomainEvent(name.GetValue(), description.GetValue()));
         }
 
-        public static Release Create(ReleaseName name, ReleaseDescription description)
+        public static Release Create(StringValueObject name, StringValueObject description)
         {
             return new Release(name, description);
         }
@@ -88,7 +93,7 @@ namespace MyProjects.Domain.ReleaseAggregate
             SetDirty();
         }
 
-        public void SetOwner(ReleaseOwner owner)
+        public void SetOwner(StringValueObject owner)
         {
            if (Status != ReleaseStatus.Created || Status != ReleaseStatus.Open)
            {
@@ -101,7 +106,7 @@ namespace MyProjects.Domain.ReleaseAggregate
             SetDirty();
         }
 
-        public void SetVersion(ReleaseVersion version, ReleaseVersionName versionName)
+        public void SetVersion(ReleaseVersion version)
         {
             if (Status != ReleaseStatus.Open)
             {
@@ -110,26 +115,12 @@ namespace MyProjects.Domain.ReleaseAggregate
             }
                         
             Version = version;
-            VersionName = versionName;
 
             SetDirty();
         }
 
-        public void ClearVersion()
-        {
-            if (Status != ReleaseStatus.Open)
-            {
-                AddBrokenRule("Version", "Version can be cleared only for Open releases");
-                return;
-            }
-            
-            Version = null;
-            VersionName = null;
 
-            SetDirty();
-        }
-
-        public void SetGoLiveDate(ReleaseGoLiveDate goLiveDate)
+        public void SetGoLiveDate(DateTimeValueObject goLiveDate)
         {
             if (Status != ReleaseStatus.Scheduled)
             {
@@ -223,7 +214,7 @@ namespace MyProjects.Domain.ReleaseAggregate
             SetDirty();
         }
 
-        public void AddComment(ReleaseCommernt comment)
+        public void AddComment(ReleaseComment comment)
         {
             if (Status != ReleaseStatus.Open || Status != ReleaseStatus.Created || Status != ReleaseStatus.Scheduled)
             {
@@ -236,7 +227,7 @@ namespace MyProjects.Domain.ReleaseAggregate
             SetDirty();
         }
 
-        public void RemoveComment(ReleaseCommernt comment)
+        public void RemoveComment(ReleaseComment comment)
         {
             if (Status != ReleaseStatus.Open || Status != ReleaseStatus.Created || Status != ReleaseStatus.Scheduled)
             {

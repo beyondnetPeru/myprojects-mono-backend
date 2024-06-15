@@ -6,28 +6,26 @@ using Ddd.Interfaces;
 
 namespace Ddd
 {
-    public class Entity<T>
+    public class Entity<T> where T : class
     {
-        #region Members 
-        int? _requestedHashCode;
+        #region Members         
 
         private List<AbstractValidator<T>>? _businessRules;
 
         private List<ValidationFailure> _brokenRules;
+
+        private List<INotification> _domainEvents;
+
+        public IReadOnlyCollection<INotification> DomainEvents => _domainEvents.AsReadOnly();
 
         #endregion
 
         #region Properties
 
         public IdValueObject Id { get; private set; }
-        public AuditValueObject? Audit { get; set; }
         public TrackingEntity Traking { get; private set; } = default;
-
-        #endregion
-
-        #region Properties
-
         public bool IsValid => _brokenRules!.Any();
+        public int Version { get; private set; }
 
         #endregion
 
@@ -37,10 +35,13 @@ namespace Ddd
         {
             _businessRules = new List<AbstractValidator<T>>();
             _brokenRules = new List<ValidationFailure>();
+            _domainEvents = new List<INotification>();
 
             Id = IdValueObject.Create();
+            Version = 0;
 
-            SetNew();            
+            BusinessRules();
+            SetNew();
         }
 
         #endregion
@@ -50,38 +51,75 @@ namespace Ddd
         public void SetNew()
         {
             Traking = new TrackingEntity { New = true, Dirty = false };
-
-            // TODO: Get user by context
-            Audit = AuditValueObject.Create("default");
         }
 
         public void SetDirty()
         {
             Traking = new TrackingEntity { New = false, Dirty = true };
+        }
 
-            // TODO: Get user by context
-            Audit = AuditValueObject.Create("default");
+        public void SetVersion(int version)
+        {
+            if (version <= 0)
+            {
+                AddBrokenRule("Version", "Version is less or equal than 0");
+                return;
+            }
+
+            Version = version;
         }
 
         #endregion
 
         #region Business Rules
+
+        private void BusinessRules()
+        {
+
+        }
+
         public void AddBusinessRule(AbstractValidator<T> rule)
         {
-            ArgumentNullException.ThrowIfNull(rule, nameof(rule));
+            if (_businessRules == null)
+            {
+                AddBrokenRule("BusinessRules", "BusinessRules is null");
+                return;
+            }
 
             _businessRules?.Add(rule);
         }
 
         public void AddBusinessRules(IEnumerable<AbstractValidator<T>> rules)
         {
-            ArgumentNullException.ThrowIfNull(rules, nameof(rules));
+            if (_businessRules == null)
+            {
+                AddBrokenRule("BusinessRules", "BusinessRules is null");
+                return;
+            }
+
+            if (rules.Count() == 0)
+            {
+                AddBrokenRule("BusinessRules", "BusinessRules is empty");
+                return;
+            }
 
             _businessRules?.AddRange(rules);
         }
 
         public void AddBrokenRule(string propertyName, string message)
         {
+            if (string.IsNullOrEmpty(propertyName))
+            {
+                AddBrokenRule("PropertyName", "PropertyName is null or empty");
+                return;
+            }
+
+            if (string.IsNullOrEmpty(message))
+            {
+                AddBrokenRule("Message", "Message is null or empty");
+                return;
+            }
+
             _brokenRules.Add(new ValidationFailure(propertyName, message));
         }
 
@@ -94,6 +132,7 @@ namespace Ddd
                 return;
             }
 
+            // Run validation and add errors from Entity 
             foreach (var rule in _businessRules)
             {
                 result = rule.Validate(item);
@@ -101,6 +140,23 @@ namespace Ddd
                 if (!result.IsValid)
                 {
                     _brokenRules.AddRange(result.Errors);
+                }
+            }
+
+            // Add errors from ValueObjects
+            var properties = item.GetType().GetProperties().Where(
+                 p => p.PropertyType.IsSubclassOf(typeof(ValueObject<>)));
+
+            if (properties != null)
+            {
+                foreach (var property in properties)
+                {
+                    var valueObject = property as ValueObject<T>;
+
+                    if (!valueObject!.IsValid)
+                    {
+                        _brokenRules.AddRange(valueObject!.GetBrokenRules());
+                    }
                 }
             }
         }
@@ -112,21 +168,27 @@ namespace Ddd
 
         #endregion
 
-        #region DomainEvents
+        #region DomainEvents                        
 
-        private List<INotification> _domainEvents = new List<INotification>();
-        private TrackingEntity traking;
-
-        public IReadOnlyCollection<INotification> DomainEvents => _domainEvents.AsReadOnly();
-        
         public void AddDomainEvent(INotification eventItem)
         {
-            _domainEvents = _domainEvents ?? new List<INotification>();
+            if (eventItem == null)
+            {
+                AddBrokenRule("EventItem", "EventItem is null");
+                return;
+            }
+
             _domainEvents.Add(eventItem);
         }
 
         public void RemoveDomainEvent(INotification eventItem)
         {
+            if (eventItem == null)
+            {
+                AddBrokenRule("EventItem", "EventItem is null");
+                return;
+            }
+
             _domainEvents?.Remove(eventItem);
         }
 
@@ -151,13 +213,13 @@ namespace Ddd
 
             Entity<T> item = (Entity<T>)obj;
 
-            
+
             return item.Id == Id;
         }
 
         public override int GetHashCode()
         {
-           return base.GetHashCode();
+            return base.GetHashCode();
         }
 
         public static bool operator ==(Entity<T> left, Entity<T> right)
@@ -172,6 +234,7 @@ namespace Ddd
         {
             return !(left == right);
         }
+
         #endregion
     }
 }
