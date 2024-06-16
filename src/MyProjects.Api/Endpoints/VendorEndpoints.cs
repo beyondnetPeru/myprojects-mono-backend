@@ -2,7 +2,7 @@
 using Ddd.Dtos;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.OutputCaching;
-using MyProjects.Application.Dtos.Vendor;
+using MyProjects.Application.Release.Dtos.Vendor;
 using MyProjects.Domain.VendorAggregate;
 
 namespace MyProjects.Api.Endpoints

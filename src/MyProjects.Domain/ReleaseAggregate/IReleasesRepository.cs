@@ -2,7 +2,7 @@
 
 namespace MyProjects.Domain.ReleaseAggregate
 {
-    public interface IReleasesRepository : IRepository<Release>
+    public interface IReleasesRepository : IRepository<ReleaseEntity>
     {
        
     }

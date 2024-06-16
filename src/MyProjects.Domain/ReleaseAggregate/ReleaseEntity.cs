@@ -5,26 +5,26 @@ using MyProjects.Domain.ReleaseAggregate.Events;
 
 namespace MyProjects.Domain.ReleaseAggregate
 {
-    public class Release : Entity<Release>, IAggregateRoot
+    public class ReleaseEntity : Entity<ReleaseEntity>, IAggregateRoot
     {
-        public StringValueObject Name { get; set; }
-        public StringValueObject Description { get; set; }
-        public DateTimeValueObject GoLiveDate { get; set; }
-        public StringValueObject? Owner { get; set; }
-        public List<ReleaseFeature>? Features { get; set; }
-        public List<ReleaseReference>? References { get; set; }
-        public List<ReleaseComment>? Comments { get; set; }
-        public ReleaseVersion Version { get; set; } 
+        public StringValueObject Title { get; private set; }
+        public StringValueObject Description { get; private set; }
+        public DateTimeValueObject GoLiveDate { get; private set; }
+        public StringValueObject? Owner { get; private set; }
+        public List<ReleaseFeature>? Features { get; private set; }
+        public List<ReleaseReference>? References { get; private set; }
+        public List<ReleaseComment>? Comments { get; private set; }
+        public ReleaseVersion VersionNumber { get; private set; } 
 
         public ReleaseStatus Status { get; set; }
 
-        private Release(StringValueObject name, StringValueObject description)
+        private ReleaseEntity(StringValueObject title, StringValueObject description)
         {
-            Name = name;
+            Title = title;
             Description = description;
             GoLiveDate = DateTimeValueObject.Create(DateTime.Now);
             Owner = StringValueObject.Create(string.Empty);
-            Version = ReleaseVersion.Create(StageEnum.Alpha,0,0,0);
+            VersionNumber = ReleaseVersion.Create(StageEnum.Alpha,0,0,0);
 
             Features = new List<ReleaseFeature>();
             References = new List<ReleaseReference>();
@@ -32,12 +32,12 @@ namespace MyProjects.Domain.ReleaseAggregate
 
             Status = ReleaseStatus.Created;
 
-            AddDomainEvent(new ReleaseCreatedDomainEvent(name.GetValue(), description.GetValue()));
+            AddDomainEvent(new ReleaseCreatedDomainEvent(title.GetValue(), description.GetValue()));
         }
 
-        public static Release Create(StringValueObject name, StringValueObject description)
+        public static ReleaseEntity Create(StringValueObject name, StringValueObject description)
         {
-            return new Release(name, description);
+            return new ReleaseEntity(name, description);
         }
 
         public void Open()
@@ -113,8 +113,8 @@ namespace MyProjects.Domain.ReleaseAggregate
                 AddBrokenRule("Version", "Version can be set only for Open releases"  );
                 return;
             }
-                        
-            Version = version;
+
+            VersionNumber = version;
 
             SetDirty();
         }
