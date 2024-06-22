@@ -7,9 +7,19 @@ namespace MyProjects.Infrastructure.Database
 {
     public class ApplicationDbContext : IdentityDbContext
     {
-        public DbSet<ProjectTable> Projects { get; set; }
-        public DbSet<VendorTable> Vendors { get; set; }
-        public DbSet<ProjectVendorTable> ProjectVendors { get; set; }
+        public DbSet<ReleaseTable> Releases { get; set; }
+        public DbSet<ReleaseFeatureTable> ReleaseFeatures { get; set; }
+        public DbSet<ReleaseReferenceTable> ReleaseReferences { get; set; }
+        public DbSet<ReleaseCommentTable> ReleaseComments { get; set; }
+        public DbSet<FeatureTable> Features { get; set; }
+        public DbSet<FeaturePhaseTable> FeaturePhases { get; set; }
+        public DbSet<FeatureCommentTable> FeatureComments { get; set; }
+        public DbSet<FeatureRolloutTable> FeatureRollouts { get; set; }
+        public DbSet<ReferenceTable> References { get; set; }
+        public DbSet<CommentTable> Comments { get; set; }
+        public DbSet<PhaseTable> Phases { get; set; }
+        public DbSet<RolloutTable> Rollouts { get; set; }
+
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {            
@@ -28,31 +38,58 @@ namespace MyProjects.Infrastructure.Database
             modelBuilder.Entity<IdentityUserToken<string>>().ToTable("UserTokens");
 
 
-            modelBuilder.Entity<ProjectTable>().HasKey(p => p.Id);
-            modelBuilder.Entity<ProjectTable>().Property(p => p.Id).HasMaxLength(36);
-            modelBuilder.Entity<ProjectTable>().Property(p => p.Name).IsRequired();
-            modelBuilder.Entity<ProjectTable>().Property(p => p.Picture).IsUnicode();
+            modelBuilder.Entity<ReleaseTable>().HasKey(p => p.Id);
+            modelBuilder.Entity<ReleaseTable>().Property(p => p.Id).HasMaxLength(36);
 
 
+            modelBuilder.Entity<ReleaseFeatureTable>().HasKey(p => new { p.ReleaseId, p.FeatureId});
+            
+            modelBuilder.Entity<ReleaseFeatureTable>()
+                        .HasOne(p => p.Release)
+                        .WithMany(v => v.Features)
+                        .HasForeignKey(p => p.ReleaseId);
 
-            modelBuilder.Entity<ProjectVendorTable>().HasKey(p => new { p.ProjectId, p.VendorId });
-            modelBuilder.Entity<ProjectVendorTable>()
-                        .HasOne(p => p.Project)
-                        .WithMany(v => v.Vendors)
-                        .HasForeignKey(p => p.ProjectId);
+            modelBuilder.Entity<ReleaseReferenceTable>()
+                        .HasOne(v => v.Release)
+                        .WithMany(p => p.References)
+                        .HasForeignKey(v => v.ReleaseId);
 
-            modelBuilder.Entity<ProjectVendorTable>()
-                        .HasOne(v => v.Vendor)
-                        .WithMany(p => p.Projects)
-                        .HasForeignKey(v => v.VendorId);
+            modelBuilder.Entity<ReleaseCommentTable>()
+                        .HasOne(v => v.Release)
+                        .WithMany(p => p.Comments)
+                        .HasForeignKey(v => v.ReleaseId);
 
 
-            modelBuilder.Entity<VendorTable>().HasKey(p => p.Id);
-            modelBuilder.Entity<VendorTable>().Property(p => p.Id).HasMaxLength(36);
+            modelBuilder.Entity<FeatureTable>().HasKey(p => p.Id);
+            modelBuilder.Entity<FeatureTable>().Property(p => p.Id).HasMaxLength(36);
 
+            modelBuilder.Entity<FeaturePhaseTable>()
+                        .HasOne(p => p.Feature)
+                        .WithMany(v => v.Phases)
+                        .HasForeignKey(p => p.FeatureId);
+
+            modelBuilder.Entity<FeatureCommentTable>()
+                    .HasOne(v => v.Feature)
+                    .WithMany(p => p.Comments)
+                    .HasForeignKey(v => v.FeatureId);
+
+            modelBuilder.Entity<FeatureRolloutTable>()
+                    .HasOne(v => v.Feature)
+                    .WithMany(p => p.Rollouts)
+                    .HasForeignKey(v => v.FeatureId);
+
+
+            modelBuilder.Entity<ReferenceTable>().HasKey(p => p.Id);
+            modelBuilder.Entity<ReferenceTable>().Property(p => p.Id).HasMaxLength(36);
+
+            modelBuilder.Entity<CommentTable>().HasKey(p => p.Id);
+            modelBuilder.Entity<CommentTable>().Property(p => p.Id).HasMaxLength(36);
+
+            modelBuilder.Entity<PhaseTable>().HasKey(p => p.Id);
+            modelBuilder.Entity<PhaseTable>().Property(p => p.Id).HasMaxLength(36);
+
+            modelBuilder.Entity<RolloutTable>().HasKey(p => p.Id);
+            modelBuilder.Entity<RolloutTable>().Property(p => p.Id).HasMaxLength(36);
         }
-
-
-
     }
 }

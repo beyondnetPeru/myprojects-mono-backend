@@ -7,7 +7,7 @@ namespace MyProjects.Domain.ReleaseAggregate
 {
     public class ReleaseFeature :  Entity<ReleaseFeature>
     {
-        public IdValueObject ProjectId { get; set; }        
+        public IdValueObject ReleaseId { get; set; }        
         public StringValueObject FeatureName { get; set; }
         public StringValueObject? FeatureDescription { get; set; }
         public List<ReleaseFeaturePhase> Phases { get; set; }
@@ -15,9 +15,9 @@ namespace MyProjects.Domain.ReleaseAggregate
         public List<ReleaseFeatureRollout> Rollouts { get; set; }
         public ReleaseFeatureStatus FeatureStatus { get; set; }
 
-        private ReleaseFeature(IdValueObject projectId, StringValueObject featureName)
+        private ReleaseFeature(IdValueObject releaseId, StringValueObject featureName)
         {
-            ProjectId = projectId;            
+            ReleaseId = releaseId;            
             FeatureName = featureName;
             FeatureDescription = StringValueObject.Create(string.Empty);
             FeatureStatus = ReleaseFeatureStatus.Registered;
@@ -26,12 +26,12 @@ namespace MyProjects.Domain.ReleaseAggregate
             Comments = new List<ReleaseFeatureComment>();
             Rollouts = new List<ReleaseFeatureRollout>();
 
-            AddDomainEvent(new ReleaseFeatureRegisteredDomainEvent(projectId.GetValue(), Id.GetValue(), featureName.GetValue()));
+            AddDomainEvent(new ReleaseFeatureRegisteredDomainEvent(releaseId.GetValue(), Id.GetValue(), featureName.GetValue()));
         }
 
-        public static ReleaseFeature Create(IdValueObject projectId, StringValueObject featureName)
+        public static ReleaseFeature Create(IdValueObject releaseId, StringValueObject featureName)
         {
-            return new ReleaseFeature(projectId, featureName);
+            return new ReleaseFeature(releaseId, featureName);
         }
 
         public void UpdateName(StringValueObject featureName)

@@ -39,7 +39,7 @@ namespace MyProjects.Projects.Api.Endpoints
                                                                                              IOutputCacheStore outputCacheStore,
                                                                                              IMapper mapper)
         {
-            var command = mapper.Map<UpdateReleaseDto, UpdateReleaseCommand>(updateProjectDto);
+            var command = mapper.Map<UpdateReleaseDto, ChangeReleaseTitleCommand>(updateProjectDto);
             
             await mediator.Send(command);
             await ClearRefCache(outputCacheStore);

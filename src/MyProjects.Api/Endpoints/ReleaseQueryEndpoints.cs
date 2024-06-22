@@ -2,18 +2,23 @@
 using Ddd.Dtos;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
+using MyProjects.Api.Common;
 using MyProjects.Application.Release.Dtos.Release;
 using MyProjects.Application.Release.UseCases.Release.Query;
+using MyProjects.Shared.Application.Cache;
 
 
 namespace MyProjects.Projects.Api.Endpoints
 {
     public static class ReleaseQueryEndpoints
     {
-        public static RouteGroupBuilder MapProjects(this RouteGroupBuilder group)
+        public static RouteGroupBuilder MapProjects(this RouteGroupBuilder group, IConfiguration configuration)
         {
             group.MapGet("/", GetAllAsync)
-                .CacheOutput(c => c.Expire(TimeSpan.FromSeconds(60)).Tag("projects-get"));
+                .CacheOutput(c => c.Expire(TimeSpan.FromSeconds(
+                    MemoryTree.TimeToLive(configuration)
+                    )).Tag(Tags.TAG_CACHE_RELEASE));
+
             group.MapGet("/{id}", GetByIdAsync);
             
             return group;

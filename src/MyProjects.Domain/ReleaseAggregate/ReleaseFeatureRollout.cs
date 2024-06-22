@@ -7,12 +7,12 @@ namespace MyProjects.Domain.ReleaseAggregate
     public class ReleaseFeatureRollout : Entity<ReleaseFeatureRollout>
     {
         public StringValueObject Country { get; set; }
-        public DateTimeValueObject Date { get; set; }
+        public DateTimeValueObject RegisterDate { get; set; }
 
         private ReleaseFeatureRollout(StringValueObject country, DateTimeValueObject date)
         {
             Country = country;
-            Date = date;
+            RegisterDate = date;
         }
 
         public static ReleaseFeatureRollout Create(StringValueObject country, DateTimeValueObject date)
@@ -27,7 +27,7 @@ namespace MyProjects.Domain.ReleaseAggregate
 
         public void UpdateDate(DateTimeValueObject date)
         {
-            Date = date;
+            RegisterDate = date;
         }
     }
 }

@@ -11,9 +11,7 @@ namespace MyProjects.Application.Release.Mappers
         public ReleaseProfile()
         {
             CreateMap<CreateReleaseDto, CreateReleaseCommand>();
-            CreateMap<UpdateReleaseDto, UpdateReleaseCommand>();
             CreateMap<ReleaseEntity, ReleaseDto>();
-
         }
     }
 }

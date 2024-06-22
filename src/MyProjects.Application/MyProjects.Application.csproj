@@ -17,8 +17,4 @@
     <ProjectReference Include="..\MyProjects.Domain\MyProjects.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Dtos\Project\" />
-  </ItemGroup>
-
 </Project>

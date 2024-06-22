@@ -48,7 +48,7 @@ builder.Services.AddAuthorization();
 
 // Inmplementations
 builder.Services.AddMediatR(c => c.RegisterServicesFromAssemblies(typeof(Program).Assembly));
-builder.Services.AddScoped<IReleasesRepository, ProjectsRepository>();
+builder.Services.AddScoped<IReleasesRepository, ReleasesRepository>();
 builder.Services.AddScoped<IVendorRepository, VendorRepository>();
 builder.Services.AddTransient<IFileStorage, LocalFileStorage>(); // TODO: Realocate to Infrastructure based on cloud
 builder.Services.AddHttpContextAccessor();//Complement for LocalFileStorage with wwwroot

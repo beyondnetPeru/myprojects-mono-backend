@@ -20,9 +20,9 @@ namespace MyProjects.Application.Release.UseCases.Release.Query
         {
             var data = await repository.GetById(request.Id);
 
-            var result = mapper.Map<ReleaseDto>(data);
+            var dto = mapper.Map<ReleaseDto>(data);
 
-            return result;
+            return dto;
         }
     }
 }

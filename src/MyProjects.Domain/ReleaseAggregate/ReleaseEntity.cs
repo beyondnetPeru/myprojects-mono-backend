@@ -40,6 +40,32 @@ namespace MyProjects.Domain.ReleaseAggregate
             return new ReleaseEntity(name, description);
         }
 
+        public void ChangeTitle(StringValueObject title)
+        {
+            if (Status != ReleaseStatus.Created)
+            {
+                AddBrokenRule("Title", "Title can be changed only if release is in Created status");
+                return;
+            }
+
+            Title = title;
+
+            SetDirty();
+        }
+
+        public void ChangeDescription(StringValueObject description)
+        {
+            if (Status != ReleaseStatus.Created)
+            {
+                AddBrokenRule("Description", "Description can be changed only if release is in Created status");
+                return;
+            }
+
+            Description = description;
+
+            SetDirty();
+        }
+
         public void Open()
         {
             if (Status != ReleaseStatus.Created)
