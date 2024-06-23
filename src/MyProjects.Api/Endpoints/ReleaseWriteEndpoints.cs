@@ -34,12 +34,12 @@ namespace MyProjects.Projects.Api.Endpoints
             return TypedResults.Ok();
         }
 
-        public static async Task<Results<Ok, BadRequest>> UpdateAsync(string id, UpdateReleaseDto updateProjectDto,
+        public static async Task<Results<Ok, BadRequest>> UpdateAsync(string id, ChangeReleaseTitleDto changeReleaseTitleDto,
                                                                                              IMediator mediator,
                                                                                              IOutputCacheStore outputCacheStore,
                                                                                              IMapper mapper)
         {
-            var command = mapper.Map<UpdateReleaseDto, ChangeReleaseTitleCommand>(updateProjectDto);
+            var command = mapper.Map<ChangeReleaseTitleDto, ChangeReleaseTitleCommand>(changeReleaseTitleDto);
             
             await mediator.Send(command);
             await ClearRefCache(outputCacheStore);

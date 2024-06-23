@@ -1,14 +1,11 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using MyProjects.Api.Endpoints;
 using MyProjects.Domain.ReleaseAggregate;
-using MyProjects.Domain.VendorAggregate;
 using MyProjects.Infrastructure.Database;
-using MyProjects.Infrastructure.Repositories.Projects;
-using MyProjects.Infrastructure.Repositories.Vendors;
 using MyProjects.Projects.Api.Endpoints;
 using MyProjects.Shared.Infrastructure.FileStorage;
+using Myreleases.Infrastructure.Repositories.releases;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -49,7 +46,6 @@ builder.Services.AddAuthorization();
 // Inmplementations
 builder.Services.AddMediatR(c => c.RegisterServicesFromAssemblies(typeof(Program).Assembly));
 builder.Services.AddScoped<IReleasesRepository, ReleasesRepository>();
-builder.Services.AddScoped<IVendorRepository, VendorRepository>();
 builder.Services.AddTransient<IFileStorage, LocalFileStorage>(); // TODO: Realocate to Infrastructure based on cloud
 builder.Services.AddHttpContextAccessor();//Complement for LocalFileStorage with wwwroot
 
@@ -65,7 +61,6 @@ app.UseAuthorization();
 
 // Endpoints
 app.MapGroup("/projects").MapProjects();
-app.MapGroup("/vendors").MapVendors();
 
 // Run
 app.Run();
