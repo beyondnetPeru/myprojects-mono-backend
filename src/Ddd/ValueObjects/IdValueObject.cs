@@ -4,7 +4,7 @@ namespace Ddd.ValueObjects
 {
     public class IdValueObject : ValueObject<IdValueObject>
     {
-        public string Value { get; private set; }
+        private string Value { get;  }
 
         protected IdValueObject()
         {           
@@ -15,11 +15,18 @@ namespace Ddd.ValueObjects
             this.Validate(this);
         }
 
-        public void SetValue(string value)
+        protected IdValueObject(string value)
         {
-            ArgumentNullException.ThrowIfNull(value, nameof(value));
-
             Value = value;
+
+            this.AddBusinessRule(new IdValueObjectValidator());
+
+            this.Validate(this);
+        }
+
+        public static IdValueObject SetValue(string value)
+        {
+            return new IdValueObject(value);
         }
 
         public string GetValue()

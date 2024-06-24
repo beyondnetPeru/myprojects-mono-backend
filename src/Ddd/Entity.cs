@@ -24,7 +24,16 @@ namespace Ddd
 
         public IdValueObject Id { get; private set; }
         public TrackingEntity Traking { get; private set; } = default;
-        public bool IsValid => _brokenRules!.Any();
+        
+        public bool IsValid
+        {
+            get
+            {
+                Validate();
+                return _brokenRules.Count == 0;
+            }
+        }
+            
         public int Version { get; private set; }
 
         #endregion
@@ -38,9 +47,11 @@ namespace Ddd
             _domainEvents = new List<INotification>();
 
             Id = IdValueObject.Create();
+            
             Version = 0;
 
             BusinessRules();
+
             SetNew();
         }
 
@@ -123,28 +134,25 @@ namespace Ddd
             _brokenRules.Add(new ValidationFailure(propertyName, message));
         }
 
-        public void Validate(T item)
+        private void Validate()
         {
-            ValidationResult result;
+            if (_businessRules == null) return;
 
-            if (_businessRules == null)
-            {
-                return;
-            }
+            var entity = this as T;
 
             // Run validation and add errors from Entity 
-            foreach (var rule in _businessRules)
+            _businessRules.ForEach(rule =>
             {
-                result = rule.Validate(item);
+                var result = rule.Validate(entity!);
 
                 if (!result.IsValid)
                 {
                     _brokenRules.AddRange(result.Errors);
                 }
-            }
+            });
 
             // Add errors from ValueObjects
-            var properties = item.GetType().GetProperties().Where(
+            var properties = entity!.GetType().GetProperties().Where(
                  p => p.PropertyType.IsSubclassOf(typeof(ValueObject<>)));
 
             if (properties != null)

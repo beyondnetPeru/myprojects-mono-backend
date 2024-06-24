@@ -6,11 +6,11 @@ namespace Ddd.ValueObjects.Validators
     {
         public IdValueObjectValidator()
         {
-            RuleFor(x => x.Value)
+            RuleFor(x => x.GetValue())
                 .NotEmpty()
                 .WithMessage("Value cannot be empty.");
 
-            RuleFor(x => x.Value).IsGuid().WithMessage("Value for Id have to be a Guid");
+            RuleFor(x => x.GetValue()).IsGuid().WithMessage("Value for Id have to be a Guid");
         }
     }
 }

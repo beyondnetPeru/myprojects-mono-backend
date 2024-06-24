@@ -15,11 +15,11 @@ namespace MyProjects.Domain.ReleaseAggregate
         public List<ReleaseFeatureRollout> Rollouts { get; set; }
         public ReleaseFeatureStatus FeatureStatus { get; set; }
 
-        private ReleaseFeature(IdValueObject releaseId, StringValueObject featureName)
+        private ReleaseFeature(IdValueObject releaseId, StringValueObject featureName, StringValueObject featureDescription)
         {
             ReleaseId = releaseId;            
             FeatureName = featureName;
-            FeatureDescription = StringValueObject.Create(string.Empty);
+            FeatureDescription = featureDescription;
             FeatureStatus = ReleaseFeatureStatus.Registered;
 
             Phases = new List<ReleaseFeaturePhase>();
@@ -29,9 +29,9 @@ namespace MyProjects.Domain.ReleaseAggregate
             AddDomainEvent(new ReleaseFeatureRegisteredDomainEvent(releaseId.GetValue(), Id.GetValue(), featureName.GetValue()));
         }
 
-        public static ReleaseFeature Create(IdValueObject releaseId, StringValueObject featureName)
+        public static ReleaseFeature Create(IdValueObject releaseId, StringValueObject featureName, StringValueObject featureDescription)
         {
-            return new ReleaseFeature(releaseId, featureName);
+            return new ReleaseFeature(releaseId, featureName, featureDescription);
         }
 
         public void UpdateName(StringValueObject featureName)

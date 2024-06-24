@@ -1,7 +1,7 @@
-﻿
-using Ddd.ValueObjects;
+﻿using Ddd.ValueObjects;
 using MediatR;
 using MyProjects.Domain.ReleaseAggregate;
+using MyProjects.Shared.Domain;
 
 namespace MyProjects.Application.Release.UseCases.Release.Commands
 {
@@ -14,6 +14,9 @@ namespace MyProjects.Application.Release.UseCases.Release.Commands
             var release = await repository.GetById(request.Id);
             
             release.ChangeDescription(StringValueObject.Create(request.Description));
+
+            if (!release.IsValid)
+                throw new DomainException(release.GetBrokenRules());
 
             await repository.Update(release);
         }

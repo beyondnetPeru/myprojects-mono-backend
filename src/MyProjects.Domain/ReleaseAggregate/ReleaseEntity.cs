@@ -80,7 +80,7 @@ namespace MyProjects.Domain.ReleaseAggregate
             SetDirty();
         }
 
-        public void Schedule()
+        public void Schedule(DateTimeValueObject goLiveDate)
         {
             if (Status != ReleaseStatus.Open)
             {
@@ -88,6 +88,7 @@ namespace MyProjects.Domain.ReleaseAggregate
                 return;
             }
 
+            GoLiveDate = goLiveDate;
             Status = ReleaseStatus.Scheduled;
 
             SetDirty();
@@ -106,7 +107,7 @@ namespace MyProjects.Domain.ReleaseAggregate
             SetDirty();
         }
 
-        public void Hold()
+        public void OnHold()
         {
             if (Status != ReleaseStatus.Scheduled)
             {
