@@ -1,9 +1,9 @@
 ﻿namespace MyProjects.Infrastructure.Database.Tables
 {
-    public class ReleaseReferenceTable
+    public class ProjectReferenceTable
     {
-        public string ReleaseId { get; set; } = string.Empty;
-        public required ReleaseTable Release { get; set; }
+        public string ProjectId { get; set; } = string.Empty;
+        public required ProjectTable Project { get; set; }
         public string ReferenceId { get; set; } = string.Empty;
         public required ReferenceTable  Reference { get; set; }
     }

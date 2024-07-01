@@ -12,10 +12,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="BacklogAggregate\" />
-    <Folder Include="CalendarAggregate\" />
-    <Folder Include="ProductAggregate\" />
-    <Folder Include="ReleaseAggregate\Validators\" />
+    <Folder Include="ProjectAggregate\Validators\" />
+    <Folder Include="Shared\Validators\" />
   </ItemGroup>
 
 </Project>

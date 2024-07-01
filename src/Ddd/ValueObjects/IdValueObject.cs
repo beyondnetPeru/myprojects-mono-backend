@@ -4,24 +4,12 @@ namespace Ddd.ValueObjects
 {
     public class IdValueObject : ValueObject<IdValueObject>
     {
-        private string Value { get;  }
+        public string Value { get; }
 
-        protected IdValueObject()
-        {           
-            Value = Guid.NewGuid().ToString();
-
-            this.AddBusinessRule(new IdValueObjectValidator());
-
-            this.Validate(this);
-        }
-
-        protected IdValueObject(string value)
+        private IdValueObject(string value) 
         {
+           this.AddBusinessRule(new IdValueObjectCannotBeEmptyRule());
             Value = value;
-
-            this.AddBusinessRule(new IdValueObjectValidator());
-
-            this.Validate(this);
         }
 
         public static IdValueObject SetValue(string value)
@@ -36,7 +24,7 @@ namespace Ddd.ValueObjects
 
         public static IdValueObject Create()
         {
-            return new IdValueObject();
+            return new IdValueObject(Guid.NewGuid().ToString());
         }
 
 

@@ -1,9 +1,9 @@
 ﻿namespace MyProjects.Infrastructure.Database.Tables
 {
-    public class ReleaseCommentTable
+    public class ProjectCommentTable
     {
-        public string ReleaseId { get; set; } = string.Empty;
-        public required ReleaseTable Release { get; set; }
+        public string ProjectId { get; set; } = string.Empty;
+        public required ProjectTable Project { get; set; }
         public string CommentId { get; set; } = string.Empty;
         public required CommentTable Comment { get; set; }
     }

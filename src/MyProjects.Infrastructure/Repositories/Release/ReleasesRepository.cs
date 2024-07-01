@@ -1,174 +1,174 @@
 ﻿using AutoMapper;
-using Ddd.Dtos;
+using Ddd;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using MyProjects.Domain.ReleaseAggregate;
+using MyProjects.Domain.ProjectAggregate;
 using MyProjects.Infrastructure.Database;
 using MyProjects.Infrastructure.Database.Tables;
 using MyProjects.Shared.Application.Extensions;
 using MyProjects.Shared.Infrastructure.Database;
 
-namespace Myreleases.Infrastructure.Repositories.releases
+namespace MyProjects.Infrastructure.Repositories.Projects
 {
-    public class ReleasesRepository(ApplicationDbContext context, IMapper mapper, IHttpContextAccessor httpContextAccessor) : IReleasesRepository
+    public class ProjectsRepository(ApplicationDbContext context, IMapper mapper, IHttpContextAccessor httpContextAccessor) : IProjectsRepository
     {
-        public async Task<IEnumerable<ReleaseEntity>> GetAll(PaginationDto pagination)
+        public async Task<IEnumerable<ProjectEntity>> GetAll(Pagination pagination)
         {
-            var queryable = context.Releases.AsQueryable();
+            var queryable = context.Projects.AsQueryable();
 
             await httpContextAccessor.HttpContext!.AddPaginationInHeader(queryable);
 
             var data = await queryable.OrderBy(p => p.Title).Paginate(pagination).ToListAsync();
 
-            var releases = mapper.Map<IEnumerable<ReleaseEntity>>(data);
+            var Projects = mapper.Map<IEnumerable<ProjectEntity>>(data);
 
-            return releases;
+            return Projects;
         }
 
-        public async Task<IEnumerable<ReleaseEntity>> GetByTitle(string title)
+        public async Task<IEnumerable<ProjectEntity>> GetByTitle(string title)
         {
-            var releasesTable = await context.Releases.Where(x => x.Title.Contains(title)).OrderBy(p => p.Title).ToListAsync();
+            var ProjectsTable = await context.Projects.Where(x => x.Title.Contains(title)).OrderBy(p => p.Title).ToListAsync();
 
-            var releasesDomain = mapper.Map<IEnumerable<ReleaseEntity>>(releasesTable);
+            var ProjectsDomain = mapper.Map<IEnumerable<ProjectEntity>>(ProjectsTable);
 
-            return releasesDomain;
+            return ProjectsDomain;
         }
 
-        public async Task<ReleaseEntity> GetById(string id)
+        public async Task<ProjectEntity> GetById(string id)
         {
-            var releaseTable = await context.Releases.FirstOrDefaultAsync(x => x.Id == id);
+            var ProjectTable = await context.Projects.FirstOrDefaultAsync(x => x.Id == id);
 
-            var releaseDomain = mapper.Map<ReleaseEntity>(releaseTable);
+            var ProjectDomain = mapper.Map<ProjectEntity>(ProjectTable);
 
-            return releaseDomain;
+            return ProjectDomain;
         }
 
         public async Task<bool> Exists(string id)
         {
-            return await context.Releases.AnyAsync(x => x.Id == id);
+            return await context.Projects.AnyAsync(x => x.Id == id);
         }
 
 
-        public async Task Create(ReleaseEntity release)
+        public async Task Create(ProjectEntity Project)
         {
-            context.Add(release);
+            context.Add(Project);
             await context.SaveChangesAsync();
         }
 
 
-        public async Task Update(ReleaseEntity release)
+        public async Task Update(ProjectEntity Project)
         {
-            context.Update(release);
+            context.Update(Project);
             await context.SaveChangesAsync();
         }
 
         public async Task Delete(string id)
         {
-            await context.Releases.Where(release => release.Id == id).ExecuteDeleteAsync();
+            await context.Projects.Where(Project => Project.Id == id).ExecuteDeleteAsync();
         }
 
-        public async Task<ReleaseFeature> GetFeature(string releaseId, string featureId)
+        public async Task<ProjectFeature> GetFeature(string ProjectId, string featureId)
         {
-            var featureTable = await context.ReleaseFeatures.FirstOrDefaultAsync(x => x.ReleaseId == releaseId && x.FeatureId == featureId);
+            var featureTable = await context.ProjectFeatures.FirstOrDefaultAsync(x => x.ProjectId == ProjectId && x.FeatureId == featureId);
 
-            var featureDomain = mapper.Map<ReleaseFeature>(featureTable);
+            var featureDomain = mapper.Map<ProjectFeature>(featureTable);
 
             return featureDomain;
         }
 
-        public async Task<IEnumerable<ReleaseFeature>> GetFeatures(string releaseId)
+        public async Task<IEnumerable<ProjectFeature>> GetFeatures(string ProjectId)
         {
-            var featuresTable = await context.ReleaseFeatures.Where(x => x.ReleaseId == releaseId).ToListAsync();
+            var featuresTable = await context.ProjectFeatures.Where(x => x.ProjectId == ProjectId).ToListAsync();
 
-            var featuresDomain = mapper.Map<IEnumerable<ReleaseFeature>>(featuresTable);
+            var featuresDomain = mapper.Map<IEnumerable<ProjectFeature>>(featuresTable);
 
             return featuresDomain;
         }
 
-        public async Task AddFeature(ReleaseFeature feature)
+        public async Task AddFeature(ProjectFeature feature)
         {
-            var featureTable = mapper.Map<ReleaseFeatureTable>(feature);
+            var featureTable = mapper.Map<ProjectFeatureTable>(feature);
 
             context.Add(featureTable);
             
             await context.SaveChangesAsync();
         }
 
-        public async Task RemoveFeature(ReleaseFeature feature)
+        public async Task RemoveFeature(ProjectFeature feature)
         {
-            var featureTable = mapper.Map<ReleaseFeatureTable>(feature);
+            var featureTable = mapper.Map<ProjectFeatureTable>(feature);
 
             context.Remove(featureTable);
 
             await context.SaveChangesAsync();
         }
 
-        public async Task<ReleaseComment> GetComment(string releaseId, string commentId)
+        public async Task<ProjectComment> GetComment(string ProjectId, string commentId)
         {
-            var commentTable = await context.ReleaseComments.FirstOrDefaultAsync(x => x.ReleaseId == releaseId && x.CommentId == commentId);
+            var commentTable = await context.ProjectComments.FirstOrDefaultAsync(x => x.ProjectId == ProjectId && x.CommentId == commentId);
 
-            var commentDomain = mapper.Map<ReleaseComment>(commentTable);
+            var commentDomain = mapper.Map<ProjectComment>(commentTable);
 
             return commentDomain;
         }
 
-        public async Task<IEnumerable<ReleaseComment>> GetComments(string releaseId)
+        public async Task<IEnumerable<ProjectComment>> GetComments(string ProjectId)
         {
-            var commentsTable = await context.ReleaseComments.Where(x => x.ReleaseId == releaseId).ToListAsync();
+            var commentsTable = await context.ProjectComments.Where(x => x.ProjectId == ProjectId).ToListAsync();
 
-            var commentsDomain = mapper.Map<IEnumerable<ReleaseComment>>(commentsTable);
+            var commentsDomain = mapper.Map<IEnumerable<ProjectComment>>(commentsTable);
 
             return commentsDomain;
         }
 
-        public async Task AddComment(ReleaseComment comment)
+        public async Task AddComment(ProjectComment comment)
         {
-            var commentTable = mapper.Map<ReleaseCommentTable>(comment);
+            var commentTable = mapper.Map<ProjectCommentTable>(comment);
 
             context.Add(commentTable);
 
             await context.SaveChangesAsync();
         }
 
-        public async Task RemoveComment(ReleaseComment comment)
+        public async Task RemoveComment(ProjectComment comment)
         {
-            var commentTable = mapper.Map<ReleaseCommentTable>(comment);
+            var commentTable = mapper.Map<ProjectCommentTable>(comment);
 
             context.Remove(commentTable);
 
             await context.SaveChangesAsync();
         }
 
-        public async Task<ReleaseReference> GetReference(string releaseId, string referenceId)
+        public async Task<ProjectReference> GetReference(string ProjectId, string referenceId)
         {
-            var referenceTable = await context.ReleaseReferences.FirstOrDefaultAsync(x => x.ReleaseId == releaseId && x.ReferenceId == referenceId);
+            var referenceTable = await context.ProjectReferences.FirstOrDefaultAsync(x => x.ProjectId == ProjectId && x.ReferenceId == referenceId);
 
-            var referenceDomain = mapper.Map<ReleaseReference>(referenceTable);
+            var referenceDomain = mapper.Map<ProjectReference>(referenceTable);
 
             return referenceDomain;
         }
 
-        public async Task<IEnumerable<ReleaseReference>> GetReferences(string releaseId)
+        public async Task<IEnumerable<ProjectReference>> GetReferences(string ProjectId)
         {
-            var referencesTable = await context.ReleaseReferences.Where(x => x.ReleaseId == releaseId).ToListAsync();
+            var referencesTable = await context.ProjectReferences.Where(x => x.ProjectId == ProjectId).ToListAsync();
 
-            var referencesDomain = mapper.Map<IEnumerable<ReleaseReference>>(referencesTable);
+            var referencesDomain = mapper.Map<IEnumerable<ProjectReference>>(referencesTable);
 
             return referencesDomain;
         }
 
-        public async Task AddReference(ReleaseReference reference)
+        public async Task AddReference(ProjectReference reference)
         {
-            var referenceTable = mapper.Map<ReleaseReferenceTable>(reference);
+            var referenceTable = mapper.Map<ProjectReferenceTable>(reference);
 
             context.Add(referenceTable);
 
             await context.SaveChangesAsync();
         }
 
-        public async Task RemoveReference(ReleaseReference reference)
+        public async Task RemoveReference(ProjectReference reference)
         {
-            var referenceTable = mapper.Map<ReleaseReferenceTable>(reference);
+            var referenceTable = mapper.Map<ProjectReferenceTable>(reference);
 
             context.Remove(referenceTable);
 

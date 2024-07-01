@@ -1,18 +1,18 @@
 ﻿using AutoMapper;
-using Ddd.Dtos;
+using Ddd;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using MyProjects.Domain.ReleaseAggregate;
+using MyProjects.Domain.ProjectAggregate;
 using MyProjects.Infrastructure.Database;
 using MyProjects.Infrastructure.Database.Tables;
 using MyProjects.Shared.Application.Extensions;
 using MyProjects.Shared.Infrastructure.Database;
 
-namespace MyProjects.Infrastructure.Repositories.Release
+namespace MyProjects.Infrastructure.Repositories.Project
 {
     public class FeaturesRepository(ApplicationDbContext context, IMapper mapper, IHttpContextAccessor httpContextAccessor) : IFeaturesRepository
     {
-        public async Task AddComment(ReleaseFeatureComment comment)
+        public async Task AddComment(ProjectFeatureComment comment)
         {
             var commentTable = mapper.Map<FeatureCommentTable>(comment);
 
@@ -21,7 +21,7 @@ namespace MyProjects.Infrastructure.Repositories.Release
             await context.SaveChangesAsync();
         }
             
-        public async Task AddPhase(ReleaseFeaturePhase phase)
+        public async Task AddPhase(ProjectFeaturePhase phase)
         {
             var phaseTable = mapper.Map<FeaturePhaseTable>(phase);
 
@@ -30,7 +30,7 @@ namespace MyProjects.Infrastructure.Repositories.Release
             await context.SaveChangesAsync();
         }
 
-        public async Task AddRollout(ReleaseFeatureRollout rollout)
+        public async Task AddRollout(ProjectFeatureRollout rollout)
         {
             var rolloutTable = mapper.Map<FeatureRolloutTable>(rollout);
 
@@ -39,7 +39,7 @@ namespace MyProjects.Infrastructure.Repositories.Release
             await context.SaveChangesAsync();
         }
 
-        public async Task Create(ReleaseFeature item)
+        public async Task Create(ProjectFeature item)
         {
             var featureTable = mapper.Map<FeatureTable>(item);
 
@@ -57,7 +57,7 @@ namespace MyProjects.Infrastructure.Repositories.Release
             await context.SaveChangesAsync();
         }
 
-        public async Task DeleteComment(ReleaseFeatureComment comment)
+        public async Task DeleteComment(ProjectFeatureComment comment)
         {
             var commentTable = mapper.Map<FeatureCommentTable>(comment);
 
@@ -66,7 +66,7 @@ namespace MyProjects.Infrastructure.Repositories.Release
             await context.SaveChangesAsync();
         }
 
-        public async Task DeletePhase(ReleaseFeaturePhase phase)
+        public async Task DeletePhase(ProjectFeaturePhase phase)
         {
             var phaseTable = mapper.Map<FeaturePhaseTable>(phase);
 
@@ -75,7 +75,7 @@ namespace MyProjects.Infrastructure.Repositories.Release
             await context.SaveChangesAsync();
         }
 
-        public async Task DeleteRollout(ReleaseFeatureRollout rollout)
+        public async Task DeleteRollout(ProjectFeatureRollout rollout)
         {
             var rolloutTable = mapper.Map<FeatureRolloutTable>(rollout);
 
@@ -89,7 +89,7 @@ namespace MyProjects.Infrastructure.Repositories.Release
             return await context.Features.AnyAsync(x => x.Id == id);
         }
 
-        public async Task<IEnumerable<ReleaseFeature>> GetAll(PaginationDto pagination)
+        public async Task<IEnumerable<ProjectFeature>> GetAll(Pagination pagination)
         {
             var queryable = context.Features.AsQueryable();
 
@@ -97,77 +97,77 @@ namespace MyProjects.Infrastructure.Repositories.Release
 
             var data = await queryable.OrderBy(p => p.Name).Paginate(pagination).ToListAsync();
 
-            var features = mapper.Map<IEnumerable<ReleaseFeature>>(data);
+            var features = mapper.Map<IEnumerable<ProjectFeature>>(data);
 
             return features;
         }
 
-        public async Task<ReleaseFeature> GetById(string id)
+        public async Task<ProjectFeature> GetById(string id)
         {
             var featureTable = await context.Features.FirstOrDefaultAsync(x => x.Id == id);
 
-            var featureDomain = mapper.Map<ReleaseFeature>(featureTable);
+            var featureDomain = mapper.Map<ProjectFeature>(featureTable);
 
             return featureDomain;
         }
 
-        public async Task<ReleaseFeatureComment> GetComment(string featureId, string commentId)
+        public async Task<ProjectFeatureComment> GetComment(string featureId, string commentId)
         {
             var commentTable = await context.FeatureComments.FirstOrDefaultAsync(x => x.FeatureId == featureId && x.CommentId == commentId);
 
-            var commentDomain = mapper.Map<ReleaseFeatureComment>(commentTable);
+            var commentDomain = mapper.Map<ProjectFeatureComment>(commentTable);
 
             return commentDomain;
         }
 
-        public async Task<List<ReleaseFeatureComment>> GetComments(string featureId)
+        public async Task<List<ProjectFeatureComment>> GetComments(string featureId)
         {
             var commentsTable = await context.FeatureComments.Where(x => x.FeatureId == featureId).ToListAsync();
 
-            var commentsDomain = mapper.Map<List<ReleaseFeatureComment>>(commentsTable);
+            var commentsDomain = mapper.Map<List<ProjectFeatureComment>>(commentsTable);
 
             return commentsDomain;
         }
 
-        public async Task<ReleaseFeaturePhase> GetPhase(string featureId, string phaseId)
+        public async Task<ProjectFeaturePhase> GetPhase(string featureId, string phaseId)
         {
             var phaseTable = await context.FeaturePhases.FirstOrDefaultAsync(x => x.FeatureId == featureId && x.PhaseId == phaseId);
 
-            var phaseDomain = mapper.Map<ReleaseFeaturePhase>(phaseTable);
+            var phaseDomain = mapper.Map<ProjectFeaturePhase>(phaseTable);
 
             return phaseDomain;
         }
 
-        public async Task<List<ReleaseFeaturePhase>> GetPhases(string featureId)
+        public async Task<List<ProjectFeaturePhase>> GetPhases(string featureId)
         {
             var phasesTable = await context.FeaturePhases.Where(x => x.FeatureId == featureId).ToListAsync();
 
-            var phasesDomain = mapper.Map<List<ReleaseFeaturePhase>>(phasesTable);
+            var phasesDomain = mapper.Map<List<ProjectFeaturePhase>>(phasesTable);
 
             return phasesDomain;
         }
 
-        public async Task<ReleaseFeatureRollout> GetRollout(string featureId, string rolloutId)
+        public async Task<ProjectFeatureRollout> GetRollout(string featureId, string rolloutId)
         {
             var rolloutTable = await context.FeatureRollouts.FirstOrDefaultAsync(x => x.FeatureId == featureId && x.RolloutId == rolloutId);
 
-            var rolloutDomain = mapper.Map<ReleaseFeatureRollout>(rolloutTable);
+            var rolloutDomain = mapper.Map<ProjectFeatureRollout>(rolloutTable);
 
             return rolloutDomain;
         }
 
-        public async Task<List<ReleaseFeatureRollout>> GetRollouts(string featureId)
+        public async Task<List<ProjectFeatureRollout>> GetRollouts(string featureId)
         {
             var rolloutsTable = await context.FeatureRollouts.Where(x => x.FeatureId == featureId).ToListAsync();
 
-            var rolloutsDomain = mapper.Map<List<ReleaseFeatureRollout>>(rolloutsTable);
+            var rolloutsDomain = mapper.Map<List<ProjectFeatureRollout>>(rolloutsTable);
 
             return rolloutsDomain;
         }
 
-        public async Task Update(ReleaseFeature item)
+        public async Task Update(ProjectFeature item)
         {
-            var featureTable = mapper.Map<ReleaseFeature>(item);
+            var featureTable = mapper.Map<ProjectFeature>(item);
 
             context.Update(featureTable);
 

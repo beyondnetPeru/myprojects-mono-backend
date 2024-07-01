@@ -1,96 +1,69 @@
 ﻿using FluentValidation;
 using FluentValidation.Results;
 
-
 namespace Ddd
 {
-    public abstract class ValueObject<T>
+    public abstract class ValueObject<T> where T : class
     {
         #region Members
 
-        private List<AbstractValidator<T>>? _businessRules;
-        private List<ValidationFailure>? _brokenRules;
+        private ValidationResult brokenRules;
+        private List<AbstractValidator<T>> businessRules;
 
         #endregion
 
         #region Properties
 
-        public bool IsValid => _brokenRules!.Any();
+        public bool IsValid { 
+            get {
+                return brokenRules.Errors.Any();
+            }
+        }
 
         #endregion
 
         #region Constructor
-        
-        public ValueObject()
-        {
-            _businessRules = new List<AbstractValidator<T>>();
-            _brokenRules = new List<ValidationFailure>();
 
-            Guard();
+        protected ValueObject()
+        {
+            brokenRules = new ValidationResult();
+            businessRules = new List<AbstractValidator<T>>();
         }
 
         #endregion
 
-        #region Business Rules
-        private void Guard()
+        #region BusinessRules
+
+        public void AddBrokenRule(string propertyName, string message)
         {
-            var properties = this.GetType().GetProperties().Where(p =>
-                p.Name != "IsValid");
-
-            if (properties == null)
-            {
-                AddBrokenRule("ValueObject", "ValueObject must have at least one property to be validated.");
-                return;
-            }
-
+            brokenRules.Errors.Add(new ValidationFailure(propertyName, message));
         }
+
         public void AddBusinessRule(AbstractValidator<T> rule)
         {
-            ArgumentNullException.ThrowIfNull(rule, nameof(rule));
-
-            _businessRules?.Add(rule);
+            businessRules.Add(rule);
         }
 
         public void AddBusinessRules(IEnumerable<AbstractValidator<T>> rules)
         {
-            ArgumentNullException.ThrowIfNull(rules, nameof(rules));
-
-            _businessRules?.AddRange(rules);
+            businessRules.AddRange(rules);
         }
 
-        public void AddBrokenRule(string propertyName, string message)
+        public void Validate(T instance)
         {
-            _brokenRules?.Add(new ValidationFailure(propertyName, message));
-        }
-
-        public void Validate(T item)
-        {
-            ValidationResult result;
-
-            if (_businessRules == null)
+            foreach (var rule in businessRules)
             {
-                return;
-            }
-
-            foreach (var rule in _businessRules)
-            {
-                result = rule.Validate(item);
-
-                if (!result.IsValid)
+                var validation = rule.Validate(instance);
+                if (!validation.IsValid)
                 {
-                    _brokenRules?.AddRange(result.Errors);
+                    brokenRules.Errors.AddRange(validation.Errors);
                 }
             }
         }
 
-        public IReadOnlyCollection<ValidationFailure> GetBrokenRules()
-        {
-            return _brokenRules!.AsReadOnly();
-        }
-
         #endregion
 
-        #region Equality
+        #region Equals
 
         protected static bool EqualOperator(ValueObject<T> left, ValueObject<T> right)
         {
@@ -98,7 +71,7 @@ namespace Ddd
             {
                 return false;
             }
-            return ReferenceEquals(left, null) || left.Equals(right);
+            return ReferenceEquals(left, null) || left.Equals(right!);
         }
 
         protected static bool NotEqualOperator(ValueObject<T> left, ValueObject<T> right)
@@ -127,9 +100,9 @@ namespace Ddd
                 .Aggregate((x, y) => x ^ y);
         }
 
-        public ValueObject<T>? GetCopy()
+        public ValueObject<T> GetCopy()
         {
-            return MemberwiseClone() as ValueObject<T>;
+            return (ValueObject<T>)MemberwiseClone();
         }
 
         #endregion

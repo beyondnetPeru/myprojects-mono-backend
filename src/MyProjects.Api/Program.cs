@@ -1,11 +1,11 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using MyProjects.Domain.ReleaseAggregate;
+using MyProjects.Domain.ProjectAggregate;
 using MyProjects.Infrastructure.Database;
 using MyProjects.Projects.Api.Endpoints;
 using MyProjects.Shared.Infrastructure.FileStorage;
-using Myreleases.Infrastructure.Repositories.releases;
+using MyProjects.Infrastructure.Repositories.Projects;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -45,7 +45,7 @@ builder.Services.AddAuthorization();
 
 // Inmplementations
 builder.Services.AddMediatR(c => c.RegisterServicesFromAssemblies(typeof(Program).Assembly));
-builder.Services.AddScoped<IReleasesRepository, ReleasesRepository>();
+builder.Services.AddScoped<IProjectsRepository, ProjectsRepository>();
 builder.Services.AddTransient<IFileStorage, LocalFileStorage>(); // TODO: Realocate to Infrastructure based on cloud
 builder.Services.AddHttpContextAccessor();//Complement for LocalFileStorage with wwwroot
 

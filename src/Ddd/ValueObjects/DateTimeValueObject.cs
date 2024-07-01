@@ -1,20 +1,17 @@
 ﻿namespace Ddd.ValueObjects
 {
-    public class DateTimeValueObject : ValueObject<DateTime>
+    public class DateTimeValueObject : ValueObject<DateTimeValueObject>
     {
-        public DateTime Value { get; private set; }
+        public DateTime Value { get; }
 
-        protected DateTimeValueObject()
+        protected DateTimeValueObject(DateTime value)
         {
-            Value = DateTime.Now;
+            Value = value.ToUniversalTime();
         }
 
         public static DateTimeValueObject Create(DateTime value)
         {
-            return new DateTimeValueObject
-            {
-                Value = value
-            };
+            return new DateTimeValueObject(value);
         }
 
         protected override IEnumerable<object> GetEqualityComponents()

@@ -7,10 +7,10 @@ namespace MyProjects.Infrastructure.Database
 {
     public class ApplicationDbContext : IdentityDbContext
     {
-        public DbSet<ReleaseTable> Releases { get; set; }
-        public DbSet<ReleaseFeatureTable> ReleaseFeatures { get; set; }
-        public DbSet<ReleaseReferenceTable> ReleaseReferences { get; set; }
-        public DbSet<ReleaseCommentTable> ReleaseComments { get; set; }
+        public DbSet<ProjectTable> Projects { get; set; }
+        public DbSet<ProjectFeatureTable> ProjectFeatures { get; set; }
+        public DbSet<ProjectReferenceTable> ProjectReferences { get; set; }
+        public DbSet<ProjectCommentTable> ProjectComments { get; set; }
         public DbSet<FeatureTable> Features { get; set; }
         public DbSet<FeaturePhaseTable> FeaturePhases { get; set; }
         public DbSet<FeatureCommentTable> FeatureComments { get; set; }
@@ -38,26 +38,26 @@ namespace MyProjects.Infrastructure.Database
             modelBuilder.Entity<IdentityUserToken<string>>().ToTable("UserTokens");
 
 
-            modelBuilder.Entity<ReleaseTable>().HasKey(p => p.Id);
-            modelBuilder.Entity<ReleaseTable>().Property(p => p.Id).HasMaxLength(36);
+            modelBuilder.Entity<ProjectTable>().HasKey(p => p.Id);
+            modelBuilder.Entity<ProjectTable>().Property(p => p.Id).HasMaxLength(36);
 
 
-            modelBuilder.Entity<ReleaseFeatureTable>().HasKey(p => new { p.ReleaseId, p.FeatureId});
+            modelBuilder.Entity<ProjectFeatureTable>().HasKey(p => new { p.ProjectId, p.FeatureId});
             
-            modelBuilder.Entity<ReleaseFeatureTable>()
-                        .HasOne(p => p.Release)
+            modelBuilder.Entity<ProjectFeatureTable>()
+                        .HasOne(p => p.Project)
                         .WithMany(v => v.Features)
-                        .HasForeignKey(p => p.ReleaseId);
+                        .HasForeignKey(p => p.ProjectId);
 
-            modelBuilder.Entity<ReleaseReferenceTable>()
-                        .HasOne(v => v.Release)
+            modelBuilder.Entity<ProjectReferenceTable>()
+                        .HasOne(v => v.Project)
                         .WithMany(p => p.References)
-                        .HasForeignKey(v => v.ReleaseId);
+                        .HasForeignKey(v => v.ProjectId);
 
-            modelBuilder.Entity<ReleaseCommentTable>()
-                        .HasOne(v => v.Release)
+            modelBuilder.Entity<ProjectCommentTable>()
+                        .HasOne(v => v.Project)
                         .WithMany(p => p.Comments)
-                        .HasForeignKey(v => v.ReleaseId);
+                        .HasForeignKey(v => v.ProjectId);
 
 
             modelBuilder.Entity<FeatureTable>().HasKey(p => p.Id);

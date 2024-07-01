@@ -1,22 +1,22 @@
-﻿using Ddd.ValueObjects;
+﻿using MediatR;
 using FluentValidation.Results;
 using FluentValidation;
-using MediatR;
 using Ddd.Interfaces;
+using Ddd.ValueObjects;
 
 namespace Ddd
 {
-    public class Entity<T> where T : class
+    public abstract class Entity<T> where T : class
     {
         #region Members         
 
-        private List<AbstractValidator<T>>? _businessRules;
-
-        private List<ValidationFailure> _brokenRules;
-
         private List<INotification> _domainEvents;
-
+        
         public IReadOnlyCollection<INotification> DomainEvents => _domainEvents.AsReadOnly();
+
+        private ValidationResult brokenRules;
+
+        private List<AbstractValidator<T>> businessRules;
 
         #endregion
 
@@ -29,8 +29,7 @@ namespace Ddd
         {
             get
             {
-                Validate();
-                return _brokenRules.Count == 0;
+                return brokenRules.Errors.Any();
             }
         }
             
@@ -42,17 +41,19 @@ namespace Ddd
 
         protected Entity()
         {
-            _businessRules = new List<AbstractValidator<T>>();
-            _brokenRules = new List<ValidationFailure>();
+
             _domainEvents = new List<INotification>();
+
+            brokenRules = new ValidationResult();
+
+            businessRules = new List<AbstractValidator<T>>();
 
             Id = IdValueObject.Create();
             
             Version = 0;
 
-            BusinessRules();
-
             SetNew();
+
         }
 
         #endregion
@@ -72,8 +73,7 @@ namespace Ddd
         public void SetVersion(int version)
         {
             if (version <= 0)
-            {
-                AddBrokenRule("Version", "Version is less or equal than 0");
+            {              
                 return;
             }
 
@@ -84,94 +84,36 @@ namespace Ddd
 
         #region Business Rules
 
-        private void BusinessRules()
+        public void AddBrokenRule(string propertyName, string message)
         {
-
+            brokenRules.Errors.Add(new ValidationFailure(propertyName, message));
         }
 
         public void AddBusinessRule(AbstractValidator<T> rule)
         {
-            if (_businessRules == null)
-            {
-                AddBrokenRule("BusinessRules", "BusinessRules is null");
-                return;
-            }
-
-            _businessRules?.Add(rule);
+            businessRules.Add(rule);
         }
 
         public void AddBusinessRules(IEnumerable<AbstractValidator<T>> rules)
         {
-            if (_businessRules == null)
-            {
-                AddBrokenRule("BusinessRules", "BusinessRules is null");
-                return;
-            }
-
-            if (rules.Count() == 0)
-            {
-                AddBrokenRule("BusinessRules", "BusinessRules is empty");
-                return;
-            }
-
-            _businessRules?.AddRange(rules);
+            businessRules.AddRange(rules);
         }
 
-        public void AddBrokenRule(string propertyName, string message)
+        public void Validate(T instance)
         {
-            if (string.IsNullOrEmpty(propertyName))
+            foreach (var rule in businessRules)
             {
-                AddBrokenRule("PropertyName", "PropertyName is null or empty");
-                return;
-            }
-
-            if (string.IsNullOrEmpty(message))
-            {
-                AddBrokenRule("Message", "Message is null or empty");
-                return;
-            }
-
-            _brokenRules.Add(new ValidationFailure(propertyName, message));
-        }
-
-        private void Validate()
-        {
-            if (_businessRules == null) return;
-
-            var entity = this as T;
-
-            // Run validation and add errors from Entity 
-            _businessRules.ForEach(rule =>
-            {
-                var result = rule.Validate(entity!);
-
-                if (!result.IsValid)
+                var validation = rule.Validate(instance);
+                if (!validation.IsValid)
                 {
-                    _brokenRules.AddRange(result.Errors);
-                }
-            });
-
-            // Add errors from ValueObjects
-            var properties = entity!.GetType().GetProperties().Where(
-                 p => p.PropertyType.IsSubclassOf(typeof(ValueObject<>)));
-
-            if (properties != null)
-            {
-                foreach (var property in properties)
-                {
-                    var valueObject = property as ValueObject<T>;
-
-                    if (!valueObject!.IsValid)
-                    {
-                        _brokenRules.AddRange(valueObject!.GetBrokenRules());
-                    }
+                    brokenRules.Errors.AddRange(validation.Errors);
                 }
             }
         }
 
         public IReadOnlyCollection<ValidationFailure> GetBrokenRules()
         {
-            return _brokenRules.AsReadOnly();
+            return brokenRules.Errors;
         }
 
         #endregion
@@ -180,23 +122,11 @@ namespace Ddd
 
         public void AddDomainEvent(INotification eventItem)
         {
-            if (eventItem == null)
-            {
-                AddBrokenRule("EventItem", "EventItem is null");
-                return;
-            }
-
-            _domainEvents.Add(eventItem);
+           _domainEvents.Add(eventItem);
         }
 
         public void RemoveDomainEvent(INotification eventItem)
         {
-            if (eventItem == null)
-            {
-                AddBrokenRule("EventItem", "EventItem is null");
-                return;
-            }
-
             _domainEvents?.Remove(eventItem);
         }
 
