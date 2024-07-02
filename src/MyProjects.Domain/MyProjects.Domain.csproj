@@ -12,7 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="ProjectAggregate\Validators\" />
     <Folder Include="Shared\Validators\" />
   </ItemGroup>
 

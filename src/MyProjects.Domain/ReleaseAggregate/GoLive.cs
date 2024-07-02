@@ -1,6 +1,7 @@
 ﻿using Ddd;
+using MyProjects.Domain.ReleaseAggregate.Validators;
 
-namespace MyProjects.Domain.ProjectAggregate
+namespace MyProjects.Domain.ReleaseAggregate
 {
     public class GoLive : ValueObject<GoLive>
     {
@@ -20,5 +21,13 @@ namespace MyProjects.Domain.ProjectAggregate
         {
             yield return Value;
         }
+
+        public override void BusinessRulesCheck()
+        {
+            base.BusinessRulesCheck();
+
+            AddBusinessRule(new GoLiveValidator());
+        }
+
     }
 }

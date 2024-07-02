@@ -12,7 +12,7 @@ namespace MyProjects.Infrastructure.Repositories.Projects
 {
     public class ProjectsRepository(ApplicationDbContext context, IMapper mapper, IHttpContextAccessor httpContextAccessor) : IProjectsRepository
     {
-        public async Task<IEnumerable<ProjectEntity>> GetAll(Pagination pagination)
+        public async Task<IEnumerable<ReleaseEntity>> GetAll(Pagination pagination)
         {
             var queryable = context.Projects.AsQueryable();
 
@@ -20,25 +20,25 @@ namespace MyProjects.Infrastructure.Repositories.Projects
 
             var data = await queryable.OrderBy(p => p.Title).Paginate(pagination).ToListAsync();
 
-            var Projects = mapper.Map<IEnumerable<ProjectEntity>>(data);
+            var Projects = mapper.Map<IEnumerable<ReleaseEntity>>(data);
 
             return Projects;
         }
 
-        public async Task<IEnumerable<ProjectEntity>> GetByTitle(string title)
+        public async Task<IEnumerable<ReleaseEntity>> GetByTitle(string title)
         {
             var ProjectsTable = await context.Projects.Where(x => x.Title.Contains(title)).OrderBy(p => p.Title).ToListAsync();
 
-            var ProjectsDomain = mapper.Map<IEnumerable<ProjectEntity>>(ProjectsTable);
+            var ProjectsDomain = mapper.Map<IEnumerable<ReleaseEntity>>(ProjectsTable);
 
             return ProjectsDomain;
         }
 
-        public async Task<ProjectEntity> GetById(string id)
+        public async Task<ReleaseEntity> GetById(string id)
         {
             var ProjectTable = await context.Projects.FirstOrDefaultAsync(x => x.Id == id);
 
-            var ProjectDomain = mapper.Map<ProjectEntity>(ProjectTable);
+            var ProjectDomain = mapper.Map<ReleaseEntity>(ProjectTable);
 
             return ProjectDomain;
         }
@@ -49,14 +49,14 @@ namespace MyProjects.Infrastructure.Repositories.Projects
         }
 
 
-        public async Task Create(ProjectEntity Project)
+        public async Task Create(ReleaseEntity Project)
         {
             context.Add(Project);
             await context.SaveChangesAsync();
         }
 
 
-        public async Task Update(ProjectEntity Project)
+        public async Task Update(ReleaseEntity Project)
         {
             context.Update(Project);
             await context.SaveChangesAsync();

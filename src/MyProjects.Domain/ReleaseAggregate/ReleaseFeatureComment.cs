@@ -1,24 +1,24 @@
 ﻿using Ddd;
 using Ddd.ValueObjects;
 
-namespace MyProjects.Domain.ProjectAggregate
+namespace MyReleases.Domain.ReleaseAggregate
 {
-    public  class ProjectFeatureComment : Entity<ProjectFeatureComment>
+    public  class ReleaseFeatureComment : Entity<ReleaseFeatureComment>
     {
         public StringValueObject Comment { get; set; } 
         public StringValueObject Author { get; set; }
         public StringValueObject Date { get; set; }
 
-        private ProjectFeatureComment(StringValueObject comment, StringValueObject author, StringValueObject date)
+        private ReleaseFeatureComment(StringValueObject comment, StringValueObject author, StringValueObject date)
         {
             Comment = comment;
             Author = author;
             Date = date;
         }
 
-        public static ProjectFeatureComment Create(StringValueObject comment, StringValueObject author, StringValueObject date)
+        public static ReleaseFeatureComment Create(StringValueObject comment, StringValueObject author, StringValueObject date)
         {
-            return new ProjectFeatureComment(comment, author, date);
+            return new ReleaseFeatureComment(comment, author, date);
         }
 
         public void UpdateComment(StringValueObject comment)

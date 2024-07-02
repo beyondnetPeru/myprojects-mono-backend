@@ -3,17 +3,12 @@ using Ddd.ValueObjects.Validators;
 
 namespace Ddd.ValueObjects
 {
-    public class StringNotEmptyValueObject : ValueObject<StringNotEmptyValueObject>
+    public class StringNotEmptyValueObject : ValueObject<string>
     {
-        public string Value { get; }
 
-        protected StringNotEmptyValueObject(string value) 
+        public StringNotEmptyValueObject(string value) : base(value)
         {
-            Value = value;
-
-            this.AddBusinessRule(new StringNotEmptyValueObjectValidator());
-
-            this.Validate(this);
+            AddBusinessRule(new StringNotEmptyValueObjectValidator());
         }
 
         public static StringNotEmptyValueObject Create(string value)

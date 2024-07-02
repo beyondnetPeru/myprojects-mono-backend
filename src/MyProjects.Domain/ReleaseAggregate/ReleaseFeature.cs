@@ -1,37 +1,39 @@
 ﻿
 using Ddd;
 using Ddd.ValueObjects;
-using MyProjects.Domain.ProjectAggregate.Events;
+using MyProjects.Domain.ReleaseAggregate;
+using MyProjects.Domain.ReleaseAggregate.Events;
 
-namespace MyProjects.Domain.ProjectAggregate
+
+namespace MyReleases.Domain.ReleaseAggregate
 {
-    public class ProjectFeature :  Entity<ProjectFeature>
+    public class ReleaseFeature :  Entity<ReleaseFeature>
     {
-        public IdValueObject ProjectId { get; set; }        
+        public IdValueObject ReleaseId { get; set; }        
         public StringValueObject FeatureName { get; set; }
         public StringValueObject? FeatureDescription { get; set; }
-        public List<ProjectFeaturePhase> Phases { get; set; }
-        public List<ProjectFeatureComment> Comments { get; set; }
-        public List<ProjectFeatureRollout> Rollouts { get; set; }
-        public ProjectFeatureStatus FeatureStatus { get; set; }
+        public List<ReleaseFeaturePhase> Phases { get; set; }
+        public List<ReleaseFeatureComment> Comments { get; set; }
+        public List<ReleaseFeatureRollout> Rollouts { get; set; }
+        public ReleaseFeatureStatus FeatureStatus { get; set; }
 
-        private ProjectFeature(IdValueObject projectId, StringValueObject featureName, StringValueObject featureDescription)
+        private ReleaseFeature(IdValueObject ReleaseId, StringValueObject featureName, StringValueObject featureDescription)
         {
-            ProjectId = projectId;            
+            ReleaseId = ReleaseId;            
             FeatureName = featureName;
             FeatureDescription = featureDescription;
-            FeatureStatus = ProjectFeatureStatus.Registered;
+            FeatureStatus = ReleaseFeatureStatus.Registered;
 
-            Phases = new List<ProjectFeaturePhase>();
-            Comments = new List<ProjectFeatureComment>();
-            Rollouts = new List<ProjectFeatureRollout>();
+            Phases = new List<ReleaseFeaturePhase>();
+            Comments = new List<ReleaseFeatureComment>();
+            Rollouts = new List<ReleaseFeatureRollout>();
 
-            AddDomainEvent(new ProjectFeatureRegisteredDomainEvent(ProjectId.GetValue(), Id.GetValue(), featureName.Value));
+            AddDomainEvent(new ReleaseFeatureRegisteredDomainEvent(ReleaseId.GetValue(), Id.GetValue(), featureName.Value));
         }
 
-        public static ProjectFeature Create(IdValueObject ProjectId, StringValueObject featureName, StringValueObject featureDescription)
+        public static ReleaseFeature Create(IdValueObject ReleaseId, StringValueObject featureName, StringValueObject featureDescription)
         {
-            return new ProjectFeature(ProjectId, featureName, featureDescription);
+            return new ReleaseFeature(ReleaseId, featureName, featureDescription);
         }
 
         public void UpdateName(StringValueObject featureName)
@@ -44,9 +46,9 @@ namespace MyProjects.Domain.ProjectAggregate
             FeatureDescription = featureDescription;
         }
 
-        public void AddPhase(ProjectFeaturePhase phase)
+        public void AddPhase(ReleaseFeaturePhase phase)
         {
-            if (FeatureStatus != ProjectFeatureStatus.Registered)
+            if (FeatureStatus != ReleaseFeatureStatus.Registered)
             {
                 AddBrokenRule("FeatureStatus", "Feature is not registered");
                 return;
@@ -63,9 +65,9 @@ namespace MyProjects.Domain.ProjectAggregate
             SetDirty();
         }
 
-        public void RemovePhase(ProjectFeaturePhase phase)
+        public void RemovePhase(ReleaseFeaturePhase phase)
         {
-            if (FeatureStatus != ProjectFeatureStatus.Registered)
+            if (FeatureStatus != ReleaseFeatureStatus.Registered)
             {
                 AddBrokenRule("FeatureStatus", "Feature is not registered");
                 return;
@@ -82,9 +84,9 @@ namespace MyProjects.Domain.ProjectAggregate
             SetDirty();
         }
 
-        public void AddRollout(ProjectFeatureRollout rollout)
+        public void AddRollout(ReleaseFeatureRollout rollout)
         {
-            if (FeatureStatus != ProjectFeatureStatus.Registered)
+            if (FeatureStatus != ReleaseFeatureStatus.Registered)
             {
                 AddBrokenRule("FeatureStatus", "Feature is not registered");
                 return;
@@ -101,9 +103,9 @@ namespace MyProjects.Domain.ProjectAggregate
             SetDirty();
         }
 
-        public void RemoveRollout(ProjectFeatureRollout rollout)
+        public void RemoveRollout(ReleaseFeatureRollout rollout)
         {
-            if (FeatureStatus != ProjectFeatureStatus.Registered)
+            if (FeatureStatus != ReleaseFeatureStatus.Registered)
             {
                 AddBrokenRule("FeatureStatus", "Feature is not registered");
                 return;
@@ -120,10 +122,10 @@ namespace MyProjects.Domain.ProjectAggregate
             SetDirty();
         }
 
-        public void AddComment(ProjectFeatureComment comment)
+        public void AddComment(ReleaseFeatureComment comment)
         {
 
-            if (FeatureStatus == ProjectFeatureStatus.Canceled)
+            if (FeatureStatus == ReleaseFeatureStatus.Canceled)
             {
                 AddBrokenRule("FeatureStatus", "Feature is canceled");
                 return;
@@ -140,9 +142,9 @@ namespace MyProjects.Domain.ProjectAggregate
             SetDirty();
         }
 
-        public void RemoveComment(ProjectFeatureComment comment)
+        public void RemoveComment(ReleaseFeatureComment comment)
         {
-            if (FeatureStatus == ProjectFeatureStatus.Canceled)
+            if (FeatureStatus == ReleaseFeatureStatus.Canceled)
             {
                 AddBrokenRule("FeatureStatus", "Feature is canceled");
                 return;
@@ -161,39 +163,39 @@ namespace MyProjects.Domain.ProjectAggregate
 
         public void OnHold()
         {
-            if (FeatureStatus != ProjectFeatureStatus.Registered)
+            if (FeatureStatus != ReleaseFeatureStatus.Registered)
             {
                 AddBrokenRule("FeatureStatus", "Feature is not registered");
                 return;
             }
 
-            FeatureStatus = ProjectFeatureStatus.OnHold;
+            FeatureStatus = ReleaseFeatureStatus.OnHold;
 
             SetDirty();
         }
 
         public void Cancel()
         {
-            if (FeatureStatus == ProjectFeatureStatus.Canceled)
+            if (FeatureStatus == ReleaseFeatureStatus.Canceled)
             {
                 AddBrokenRule("FeatureStatus", "Feature is already canceled");
                 return;
             }
 
-            FeatureStatus = ProjectFeatureStatus.Canceled;
+            FeatureStatus = ReleaseFeatureStatus.Canceled;
 
             SetDirty();
         }
 
         public void Resume()
         {
-            if (FeatureStatus != ProjectFeatureStatus.OnHold)
+            if (FeatureStatus != ReleaseFeatureStatus.OnHold)
             {
                 AddBrokenRule("FeatureStatus", "Feature is not on hold");
                 return;
             }
 
-            FeatureStatus = ProjectFeatureStatus.Registered;
+            FeatureStatus = ReleaseFeatureStatus.Registered;
 
             SetDirty();
         }

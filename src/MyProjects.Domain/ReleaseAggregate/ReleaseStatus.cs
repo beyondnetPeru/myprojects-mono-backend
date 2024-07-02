@@ -1,6 +1,6 @@
-﻿namespace MyProjects.Domain.ProjectAggregate
+﻿namespace MyProjects.Domain.ReleaseAggregate
 {
-    public enum ProjectStatus 
+    public enum ReleaseStatus 
     {
         Created = 1,
         Open = 2,

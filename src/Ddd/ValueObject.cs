@@ -1,31 +1,57 @@
 ﻿using FluentValidation;
 using FluentValidation.Results;
+using System.ComponentModel;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace Ddd
 {
-    public abstract class ValueObject<T> where T : class
+    public abstract class ValueObject<T> : INotifyPropertyChanged where T : class
     {
         #region Members
 
+        private T? _value;
+
         private ValidationResult brokenRules;
+
         private List<AbstractValidator<T>> businessRules;
+
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         #endregion
 
         #region Properties
 
-        public bool IsValid { 
-            get {
-                return brokenRules.Errors.Any();
+        public bool IsValid => brokenRules.Errors.Any();
+
+        public T Value { 
+            get => Value;
+            set {
+                _value = value;
+                OnPropertyChanged(nameof(this.Value));
             }
+        }
+
+        public void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            if (propertyName.ToLower() != "value")
+            {
+                return;
+            }
+
+            Validate();
+
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));          
         }
 
         #endregion
 
         #region Constructor
 
-        protected ValueObject()
+        protected ValueObject(T value)
         {
+            _value = value;
+
             brokenRules = new ValidationResult();
             businessRules = new List<AbstractValidator<T>>();
         }
@@ -49,11 +75,13 @@ namespace Ddd
             businessRules.AddRange(rules);
         }
 
-        public void Validate(T instance)
+        private void CheckBusinessRules()
         {
+            var instance = this._value;
+
             foreach (var rule in businessRules)
             {
-                var validation = rule.Validate(instance);
+                var validation = rule.Validate(instance!);
                 if (!validation.IsValid)
                 {
                     brokenRules.Errors.AddRange(validation.Errors);
@@ -61,6 +89,17 @@ namespace Ddd
             }
         }
 
+        public virtual void Validate()
+        {
+            var PropertyValueFound = GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance).Where(m => m.Name.ToLower() == "value");
+
+            if (!PropertyValueFound.Any())
+            {
+                AddBrokenRule("ValueObject", "ValueObject has no properties");
+            }
+
+            CheckBusinessRules();
+        }
         #endregion
 
         #region Equals

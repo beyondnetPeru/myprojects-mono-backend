@@ -2,22 +2,22 @@
 using Ddd;
 using Ddd.ValueObjects;
 
-namespace MyProjects.Domain.ProjectAggregate
+namespace MyReleases.Domain.ReleaseAggregate
 {
-    public class ProjectFeatureRollout : Entity<ProjectFeatureRollout>
+    public class ReleaseFeatureRollout : Entity<ReleaseFeatureRollout>
     {
         public StringValueObject Country { get; set; }
         public DateTimeValueObject RegisterDate { get; set; }
 
-        private ProjectFeatureRollout(StringValueObject country, DateTimeValueObject date)
+        private ReleaseFeatureRollout(StringValueObject country, DateTimeValueObject date)
         {
             Country = country;
             RegisterDate = date;
         }
 
-        public static ProjectFeatureRollout Create(StringValueObject country, DateTimeValueObject date)
+        public static ReleaseFeatureRollout Create(StringValueObject country, DateTimeValueObject date)
         {
-            return new ProjectFeatureRollout(country, date);
+            return new ReleaseFeatureRollout(country, date);
         }
 
         public void UpdateCountry(StringValueObject country)

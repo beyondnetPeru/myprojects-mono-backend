@@ -1,10 +1,10 @@
 ﻿using Ddd;
 
-namespace MyProjects.Domain.ProjectAggregate.Events
+namespace MyProjects.Domain.ReleaseAggregate.Events
 {
-    public class ProjectCreatedDomainEvent : DomainEvent
+    public class ReleaseCreatedDomainEvent : DomainEvent
     {
-        public ProjectCreatedDomainEvent(string name, string description)
+        public ReleaseCreatedDomainEvent(string name, string description)
         {
             Name = name;
             Description = description;

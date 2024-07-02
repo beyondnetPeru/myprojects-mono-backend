@@ -1,25 +1,25 @@
 ﻿using Ddd;
 
-namespace MyProjects.Domain.ProjectAggregate
+namespace MyReleases.Domain.ReleaseAggregate
 {
     public enum StageEnum
     {
         Alpha = 1,
         Beta = 2,
-        ProjectCandidate = 3,
-        Project = 4,
+        ReleaseCandidate = 3,
+        Release = 4,
         GeneralAvailability = 5,
-        PostProject = 6
+        PostRelease = 6
     }
 
-    public class ProjectVersion : ValueObject<ProjectVersion>
+    public class ReleaseVersion : ValueObject<ReleaseVersion>
     {
         public StageEnum Stage { get; } 
         public int Major { get; }
         public int Minor { get; }
         public int Patch { get; }
 
-        private ProjectVersion(StageEnum stage, int major, int minor, int patch)
+        private ReleaseVersion(StageEnum stage, int major, int minor, int patch)
         {
             Stage = stage;
             Major = major;
@@ -27,9 +27,9 @@ namespace MyProjects.Domain.ProjectAggregate
             Patch = patch;
         }
 
-        public static ProjectVersion Create(StageEnum stage, int major, int minor, int patch)
+        public static ReleaseVersion Create(StageEnum stage, int major, int minor, int patch)
         {
-            return new ProjectVersion(stage, major, minor, patch);
+            return new ReleaseVersion(stage, major, minor, patch);
         }
 
         public string GetFullVersion()

@@ -1,7 +1,7 @@
 ﻿
-namespace MyProjects.Domain.ProjectAggregate
+namespace MyProjects.Domain.ReleaseAggregate
 {
-    public enum ProjectFeatureStatus
+    public enum ReleaseFeatureStatus
     {
         Registered = 1,
         OnHold = 2,

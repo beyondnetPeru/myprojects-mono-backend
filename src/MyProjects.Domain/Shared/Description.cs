@@ -1,6 +1,6 @@
 ﻿using Ddd.ValueObjects;
 
-namespace MyProjects.Domain.Shared
+namespace MyReleases.Domain.Shared
 {
     public class Description : StringValueObject
     {

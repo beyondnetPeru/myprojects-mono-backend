@@ -1,12 +1,9 @@
 ﻿namespace Ddd.ValueObjects
 {
-    public class StringValueObject : ValueObject<StringValueObject>
+    public class StringValueObject : ValueObject<string>
     {
-        public string Value { get; }
-
-        protected StringValueObject(string value)
+        public StringValueObject(string value) : base(value)
         {
-            Value = value;
         }
 
         public static StringValueObject Create(string value)

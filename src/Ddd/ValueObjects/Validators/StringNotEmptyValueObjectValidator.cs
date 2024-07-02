@@ -2,13 +2,13 @@
 
 namespace Ddd.ValueObjects.Validators
 {
-    public class StringNotEmptyValueObjectValidator : AbstractValidator<StringNotEmptyValueObject>
+    public class StringNotEmptyValueObjectValidator : AbstractValidator<string>
     {
         public StringNotEmptyValueObjectValidator()
         {
-            RuleFor(x => x.Value)
+            RuleFor(x => x)
                 .NotEmpty();
-            RuleFor(x => x.Value)
+            RuleFor(x => x)
                 .NotNull();
         }
     }

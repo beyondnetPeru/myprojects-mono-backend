@@ -1,27 +1,28 @@
 ﻿
 using Ddd;
 using Ddd.ValueObjects;
+using MyProjects.Domain.ReleaseAggregate;
 
-namespace MyProjects.Domain.ProjectAggregate
+namespace MyReleases.Domain.ReleaseAggregate
 {
-    public class ProjectFeaturePhase : Entity<ProjectFeaturePhase>
+    public class ReleaseFeaturePhase : Entity<ReleaseFeaturePhase>
     {
         public StringValueObject Name { get; set; } 
         public DateTimeValueObject StartDate { get; set; }
         public DateTimeValueObject EndDate { get; set; }
-        public ProjectFeaturePhaseStatus Status { get; set; }
+        public ReleaseFeaturePhaseStatus Status { get; set; }
 
-        private ProjectFeaturePhase(StringValueObject name)
+        private ReleaseFeaturePhase(StringValueObject name)
         {
             Name = name;
             StartDate = DateTimeValueObject.Create(DateTime.Now);
             EndDate = DateTimeValueObject.Create(DateTime.Now.AddMonths(1));
-            Status = ProjectFeaturePhaseStatus.Registered;
+            Status = ReleaseFeaturePhaseStatus.Registered;
         }
 
-        public static ProjectFeaturePhase Create(StringValueObject name)
+        public static ReleaseFeaturePhase Create(StringValueObject name)
         {
-            return new ProjectFeaturePhase(name);
+            return new ReleaseFeaturePhase(name);
         }
         
         public void UpdateName(StringValueObject name)
@@ -59,39 +60,39 @@ namespace MyProjects.Domain.ProjectAggregate
 
         public void OnHold()
         {
-            if (Status == ProjectFeaturePhaseStatus.Canceled)
+            if (Status == ReleaseFeaturePhaseStatus.Canceled)
             {
                 AddBrokenRule("Status", "Phase is canceled");
                 return;
             }
 
-            Status = ProjectFeaturePhaseStatus.OnHold;
+            Status = ReleaseFeaturePhaseStatus.OnHold;
 
             SetDirty();
         }
 
         public void Cancel()
         {
-            if (Status == ProjectFeaturePhaseStatus.Canceled)
+            if (Status == ReleaseFeaturePhaseStatus.Canceled)
             {
                 AddBrokenRule("Status", "Phase is already canceled");
                 return;
             }
             
-            Status = ProjectFeaturePhaseStatus.Canceled;
+            Status = ReleaseFeaturePhaseStatus.Canceled;
 
             SetDirty();
         }
 
         public void Resume()
         {
-            if (Status != ProjectFeaturePhaseStatus.OnHold)
+            if (Status != ReleaseFeaturePhaseStatus.OnHold)
             {
                 AddBrokenRule("Status", "Phase is not on hold");
                 return;
             }
 
-            Status = ProjectFeaturePhaseStatus.Registered;
+            Status = ReleaseFeaturePhaseStatus.Registered;
 
             SetDirty();
         }

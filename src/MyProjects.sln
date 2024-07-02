@@ -25,7 +25,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyProjects.Domain", "MyProj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ddd", "Ddd\Ddd.csproj", "{B8533E7B-DD36-4272-B744-4E011956BD09}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ddd.Test", "Ddd.Test\Ddd.Test.csproj", "{17CC1978-F781-4FE1-A337-AF899243BE91}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ddd.Test", "Ddd.Test\Ddd.Test.csproj", "{17CC1978-F781-4FE1-A337-AF899243BE91}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

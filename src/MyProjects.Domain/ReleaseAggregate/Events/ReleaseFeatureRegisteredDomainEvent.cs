@@ -1,14 +1,14 @@
 ﻿using Ddd;
 
-namespace MyProjects.Domain.ProjectAggregate.Events
+namespace MyProjects.Domain.ReleaseAggregate.Events
 {
-    public class ProjectFeatureRegisteredDomainEvent : DomainEvent
+    public class ReleaseFeatureRegisteredDomainEvent : DomainEvent
     {
         public string FeatureId { get; }
         public string ProjectId { get; }
         public string FeatureName { get; }
 
-        public ProjectFeatureRegisteredDomainEvent(string projectId, string featureId, string featureName)
+        public ReleaseFeatureRegisteredDomainEvent(string projectId, string featureId, string featureName)
         {
             ProjectId = projectId;
             FeatureId = featureId;
